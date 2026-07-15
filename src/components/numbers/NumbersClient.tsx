@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Filter, Smartphone, Send, Globe, RefreshCw } from 'lucide-react'
+import { Search, Smartphone, Send, Globe, RefreshCw } from 'lucide-react'
 import CountryCard from './CountryCard'
 import { cn } from '@/lib/utils'
 
-// Static data for initial build - will be replaced with Supabase data
 const platforms = [
-  { id: '1', name: 'Hamısı', icon: 'globe' },
   { id: '2', name: 'WhatsApp', icon: 'message-circle' },
   { id: '3', name: 'Telegram', icon: 'send' },
   { id: '4', name: 'Digər', icon: 'smartphone' },
@@ -29,23 +27,16 @@ const stockFilters = [
   { id: 'in_stock', label: 'Stokda var' },
   { id: 'premium', label: 'Premium' },
   { id: 'popular', label: 'Ən çox seçilən' },
-  { id: 'out_of_stock', label: 'Stokda yoxdur' },
 ]
 
 export default function NumbersClient() {
-  const [selectedPlatform, setSelectedPlatform] = useState('1')
+  const [selectedPlatform, setSelectedPlatform] = useState('2')
   const [searchQuery, setSearchQuery] = useState('')
   const [stockFilter, setStockFilter] = useState('all')
 
   const filteredCountries = useMemo(() => {
-    let result = countries
+    let result = countries.filter(c => c.platform_id === selectedPlatform)
 
-    // Platform filter
-    if (selectedPlatform !== '1') {
-      result = result.filter(c => c.platform_id === selectedPlatform)
-    }
-
-    // Search filter
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
       result = result.filter(c =>
@@ -55,11 +46,8 @@ export default function NumbersClient() {
       )
     }
 
-    // Stock filter
     if (stockFilter === 'in_stock') {
       result = result.filter(c => c.stock_status === 'in_stock' || c.stock_status === 'low_stock')
-    } else if (stockFilter === 'out_of_stock') {
-      result = result.filter(c => c.stock_status === 'out_of_stock')
     } else if (stockFilter === 'premium') {
       result = result.filter(c => c.is_premium)
     } else if (stockFilter === 'popular') {
@@ -81,21 +69,21 @@ export default function NumbersClient() {
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-6xl mx-auto">
-        {/* Page Header */}
-        <div className="mb-6">
+        {/* Page Header - CENTERED */}
+        <div className="text-center mb-6">
           <h1 className="section-title">Nömrələr</h1>
           <p className="section-subtitle">Platformanıza uyğun ölkələri və stok vəziyyətini görün</p>
         </div>
 
         {/* Last Updated Info */}
-        <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+        <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mb-4">
           <RefreshCw size={12} />
           <span>Stok məlumatları son dəfə 15 iyul 2026 tarixində yenilənib</span>
         </div>
 
-        {/* Platform Tabs */}
+        {/* Platform Tabs - NO "Hamısı" */}
         <div className="mb-4 overflow-x-auto hide-scrollbar">
-          <div className="flex gap-2 pb-2">
+          <div className="flex gap-2 pb-2 justify-center">
             {platforms.map((platform) => (
               <button
                 key={platform.id}
@@ -104,7 +92,7 @@ export default function NumbersClient() {
                   'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all',
                   selectedPlatform === platform.id
                     ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                    : 'glass-card hover:shadow-glass-lg text-gray-700'
+                    : 'glass-card hover:shadow-glass-lg text-gray-300'
                 )}
               >
                 {getPlatformIcon(platform.icon)}
@@ -114,22 +102,21 @@ export default function NumbersClient() {
           </div>
         </div>
 
-        {/* Search & Filter */}
+        {/* Search */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
-          {/* Search */}
           <div className="relative flex-1">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Ölkə, kod və ya platforma axtar..."
-              className="w-full pl-11 pr-4 py-3 rounded-2xl glass-card border-0 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-all"
+              className="w-full pl-11 pr-4 py-3 rounded-2xl glass-card border-0 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
             />
           </div>
         </div>
 
-        {/* Stock Filters */}
+        {/* Stock Filters - NO "Stokda yoxdur" */}
         <div className="mb-6 overflow-x-auto hide-scrollbar">
           <div className="flex gap-2 pb-1">
             {stockFilters.map((filter) => (
@@ -139,8 +126,8 @@ export default function NumbersClient() {
                 className={cn(
                   'px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all border',
                   stockFilter === filter.id
-                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                    : 'bg-white/50 text-gray-600 border-gray-200 hover:bg-gray-50'
+                    ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                    : 'bg-gray-800/50 text-gray-400 border-gray-700/50 hover:bg-gray-800'
                 )}
               >
                 {filter.label}
@@ -165,10 +152,10 @@ export default function NumbersClient() {
           </div>
         ) : (
           <div className="glass-card p-12 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
-              <Search size={24} className="text-gray-400" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-800 flex items-center justify-center">
+              <Search size={24} className="text-gray-600" />
             </div>
-            <h3 className="font-semibold text-gray-700 mb-2">Nəticə tapılmadı</h3>
+            <h3 className="font-semibold text-gray-300 mb-2">Nəticə tapılmadı</h3>
             <p className="text-sm text-gray-500">Axtarış və ya filtr parametrlərini dəyişdirin</p>
           </div>
         )}

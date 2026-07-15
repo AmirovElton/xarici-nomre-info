@@ -19,8 +19,8 @@ export default function ReviewsClient() {
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+          <div className="text-center sm:text-left">
             <h1 className="section-title">Müştəri Rəyləri</h1>
             <p className="section-subtitle">Müştərilərimizin təcrübələri</p>
           </div>
@@ -42,7 +42,7 @@ export default function ReviewsClient() {
             <div key={review.id} className="glass-card p-5">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-semibold text-gray-900">{review.name}</h3>
+                  <h3 className="font-semibold text-gray-100">{review.name}</h3>
                   <p className="text-xs text-gray-500">{review.platform} - {review.country}</p>
                 </div>
                 <div className="flex gap-0.5">
@@ -55,8 +55,8 @@ export default function ReviewsClient() {
                   ))}
                 </div>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">&ldquo;{review.message}&rdquo;</p>
-              <p className="text-xs text-gray-400 mt-3">
+              <p className="text-sm text-gray-300 leading-relaxed">&ldquo;{review.message}&rdquo;</p>
+              <p className="text-xs text-gray-600 mt-3">
                 {new Date(review.created_at).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             </div>
