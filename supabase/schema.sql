@@ -1,8 +1,23 @@
 -- XariciNomrəAz Database Schema
 -- Run this SQL in Supabase SQL Editor
+-- Bu faylı təkrar işlətmək təhlükəsizdir (IF NOT EXISTS istifadə olunur)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- =====================
+-- Əvvəlcə köhnə cədvəlləri sil (təmiz başlamaq üçün)
+-- =====================
+DROP TABLE IF EXISTS admin_activities CASCADE;
+DROP TABLE IF EXISTS info_articles CASCADE;
+DROP TABLE IF EXISTS faqs CASCADE;
+DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS countries CASCADE;
+DROP TABLE IF EXISTS platforms CASCADE;
+DROP TABLE IF EXISTS site_settings CASCADE;
+
+DROP FUNCTION IF EXISTS update_updated_at() CASCADE;
+DROP FUNCTION IF EXISTS update_country_last_updated() CASCADE;
 
 -- =====================
 -- SITE SETTINGS
