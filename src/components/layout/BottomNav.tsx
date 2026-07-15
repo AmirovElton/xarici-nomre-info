@@ -36,8 +36,8 @@ export default function BottomNav() {
                   className={cn(
                     'flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all',
                     isActive
-                      ? 'text-indigo-600 bg-indigo-50/80'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'text-indigo-400 bg-indigo-500/15'
+                      : 'text-gray-500 hover:text-gray-300'
                   )}
                 >
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />

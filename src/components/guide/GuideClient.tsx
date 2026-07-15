@@ -25,8 +25,8 @@ export default function GuideClient() {
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
+        {/* Header - CENTERED */}
+        <div className="text-center mb-6">
           <h1 className="section-title">Bələdçi</h1>
           <p className="section-subtitle">Sifarişdən əvvəl bilməli olduğunuz hər şey</p>
         </div>
@@ -44,7 +44,7 @@ export default function GuideClient() {
                     'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all',
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                      : 'glass-card hover:shadow-glass-lg text-gray-700'
+                      : 'glass-card hover:shadow-glass-lg text-gray-300'
                   )}
                 >
                   <Icon size={16} />
