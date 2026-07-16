@@ -25,29 +25,18 @@ export default function GuideClient() {
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-4xl mx-auto">
-        {/* Header - CENTERED */}
         <div className="text-center mb-6">
           <h1 className="section-title">Bələdçi</h1>
           <p className="section-subtitle">Sifarişdən əvvəl bilməli olduğunuz hər şey</p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="mb-8 overflow-x-auto hide-scrollbar">
-          <div className="flex gap-2 pb-2">
+        <div className="mb-8">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {tabs.map((tab) => {
               const Icon = tab.icon
               return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium whitespace-nowrap transition-all',
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                      : 'glass-card hover:shadow-glass-lg text-gray-300'
-                  )}
-                >
-                  <Icon size={16} />
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={cn('flex flex-col items-center gap-1.5 px-3 py-3 rounded-2xl text-xs font-medium transition-all', activeTab === tab.id ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg' : 'bg-zinc-900/70 border border-zinc-800/60 text-gray-400 hover:text-gray-200 hover:border-zinc-700')}>
+                  <Icon size={18} />
                   {tab.label}
                 </button>
               )
@@ -55,7 +44,6 @@ export default function GuideClient() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="animate-fade-in">
           {activeTab === 'what-is' && <WhatIsSection />}
           {activeTab === 'process' && <ProcessSection />}
