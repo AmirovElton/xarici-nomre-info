@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="az">
-      <body className="gradient-bg min-h-screen">
+      <body className="gradient-bg min-h-screen overflow-x-hidden">
         <Header />
         <main className="pt-20 pb-24 md:pb-8">
           {children}
