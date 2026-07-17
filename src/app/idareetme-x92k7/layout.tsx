@@ -5,19 +5,21 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Globe, MapPin, Star, MessageSquare,
-  HelpCircle, Image as ImageIcon, Settings, LogOut, Menu, X, Loader2,
+  HelpCircle, Image as ImageIcon, Settings, LogOut, Menu, X, Loader2, Lock,
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminLogin, getAdminToken, clearAdminToken } from '@/lib/admin-api'
+
+const BASE = '/idareetme-x92k7'
 
 const sidebarItems = [
-  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { label: 'Platformalar', href: '/admin/platforms', icon: Globe },
-  { label: 'Ölkələr', href: '/admin/countries', icon: MapPin },
-  { label: 'Premium', href: '/admin/premium', icon: Star },
-  { label: 'Rəylər', href: '/admin/reviews', icon: MessageSquare },
-  { label: 'FAQ', href: '/admin/faq', icon: HelpCircle },
-  { label: 'Logo və Ad', href: '/admin/logo', icon: ImageIcon },
-  { label: 'Ayarlar', href: '/admin/settings', icon: Settings },
+  { label: 'Dashboard', href: BASE, icon: LayoutDashboard },
+  { label: 'Platformalar', href: `${BASE}/platforms`, icon: Globe },
+  { label: 'Ölkələr', href: `${BASE}/countries`, icon: MapPin },
+  { label: 'Premium', href: `${BASE}/premium`, icon: Star },
+  { label: 'Rəylər', href: `${BASE}/reviews`, icon: MessageSquare },
+  { label: 'FAQ', href: `${BASE}/faq`, icon: HelpCircle },
+  { label: 'Logo və Ad', href: `${BASE}/logo`, icon: ImageIcon },
+  { label: 'Ayarlar', href: `${BASE}/settings`, icon: Settings },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -25,44 +27,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [checking, setChecking] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Check real Supabase session
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setIsLoggedIn(!!data.session)
-      setChecking(false)
-    })
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setIsLoggedIn(!!session)
-    })
-    return () => sub.subscription.unsubscribe()
+    setIsLoggedIn(!!getAdminToken())
+    setChecking(false)
   }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    const res = await adminLogin(password)
     setLoading(false)
-    if (authError) {
-      const msg = authError.message.toLowerCase()
-      if (msg.includes('not confirmed') || msg.includes('confirm')) {
-        setError('E-poçt təsdiqlənməyib. Supabase-də istifadəçini "Auto Confirm" edin.')
-      } else if (msg.includes('invalid')) {
-        setError('E-poçt və ya parol yanlışdır.')
-      } else {
-        setError('Giriş xətası: ' + authError.message)
-      }
+    if (res.ok) {
+      setIsLoggedIn(true)
+    } else {
+      setError(res.error || 'Parol yanlışdır.')
     }
   }
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
+  const handleLogout = () => {
+    clearAdminToken()
     setIsLoggedIn(false)
+    setPassword('')
   }
 
   if (checking) {
@@ -84,10 +74,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4"
                 style={{ background: 'linear-gradient(135deg, var(--accent), #6366f1)' }}
               >
-                <span className="text-white font-bold text-xl">XN</span>
+                <Lock size={22} className="text-white" />
               </div>
-              <h1 style={{ color: 'var(--text-primary)' }} className="text-xl font-bold">Admin Panel</h1>
-              <p style={{ color: 'var(--text-muted)' }} className="text-sm mt-1">XariciNomrəAz idarəetmə</p>
+              <h1 style={{ color: 'var(--text-primary)' }} className="text-xl font-bold">İdarəetmə Paneli</h1>
+              <p style={{ color: 'var(--text-muted)' }} className="text-sm mt-1">Davam etmək üçün parolu daxil edin</p>
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
               {error && (
@@ -99,21 +89,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               )}
               <div>
-                <label style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1 block">E-poçt</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="theme-input" placeholder="admin@example.com" required />
-              </div>
-              <div>
                 <label style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1 block">Parol</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="theme-input" placeholder="••••••••" required />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="theme-input"
+                  placeholder="••••••••"
+                  autoFocus
+                  required
+                />
               </div>
               <button type="submit" disabled={loading} className="w-full btn-primary disabled:opacity-50">
                 {loading && <Loader2 size={16} className="animate-spin" />}
                 Daxil ol
               </button>
             </form>
-            <p style={{ color: 'var(--text-faint)' }} className="text-xs text-center mt-4">
-              Giriş məlumatları Supabase Authentication bölməsindən yaradılır.
-            </p>
           </div>
         </div>
       </div>
@@ -123,7 +114,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Admin Shell
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      {/* Mobile Header */}
       <div
         className="md:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between backdrop-blur-xl"
         style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)' }}
@@ -131,7 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }}>
           <Menu size={20} />
         </button>
-        <span style={{ color: 'var(--text-primary)' }} className="font-bold text-sm">Admin Panel</span>
+        <span style={{ color: 'var(--text-primary)' }} className="font-bold text-sm">İdarəetmə Paneli</span>
         <button onClick={handleLogout} className="p-2 rounded-lg" style={{ color: 'var(--danger)' }}>
           <LogOut size={18} />
         </button>
@@ -141,7 +131,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 bottom-0 w-64 z-50 transition-transform md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-subtle)' }}
@@ -154,7 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div>
                 <p style={{ color: 'var(--text-primary)' }} className="font-bold text-sm">XariciNomrəAz</p>
-                <p style={{ color: 'var(--text-faint)' }} className="text-xs">Admin</p>
+                <p style={{ color: 'var(--text-faint)' }} className="text-xs">Panel</p>
               </div>
             </div>
             <button onClick={() => setSidebarOpen(false)} className="md:hidden p-1 rounded-lg" style={{ color: 'var(--text-muted)' }}>

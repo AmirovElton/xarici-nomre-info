@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Globe, MapPin, Package, Star, MessageSquare, TrendingUp, AlertCircle, Clock } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminDb } from '@/lib/admin-api'
 import { AdminLoading } from '@/components/admin/ui'
 import type { Country, Platform, Review } from '@/lib/types'
 
@@ -14,13 +14,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([
-      supabase.from('countries').select('*'),
-      supabase.from('platforms').select('*'),
-      supabase.from('reviews').select('*'),
+      adminDb<Country[]>({ action: 'select', table: 'countries' }),
+      adminDb<Platform[]>({ action: 'select', table: 'platforms' }),
+      adminDb<Review[]>({ action: 'select', table: 'reviews' }),
     ]).then(([c, p, r]) => {
-      setCountries((c.data as Country[]) || [])
-      setPlatforms((p.data as Platform[]) || [])
-      setReviews((r.data as Review[]) || [])
+      setCountries(c.data || [])
+      setPlatforms(p.data || [])
+      setReviews(r.data || [])
       setLoading(false)
     })
   }, [])
@@ -67,7 +67,6 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Low stock alerts */}
       <div className="theme-card p-6">
         <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
           <Clock size={18} style={{ color: 'var(--text-muted)' }} /> Diqqət tələb edən ölkələr

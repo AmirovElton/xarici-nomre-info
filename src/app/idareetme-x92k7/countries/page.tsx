@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit2, Trash2, MinusCircle, PlusCircle, Search, Save } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminDb } from '@/lib/admin-api'
 import { STOCK_STATUS_MAP, type StockStatus, type Country, type Platform } from '@/lib/types'
 import { AdminHeader, AdminButton, Field, TextInput, TextArea, Select, Toggle, Modal, AdminLoading, AdminEmpty, Toast } from '@/components/admin/ui'
 
@@ -42,12 +42,12 @@ export default function AdminCountriesPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const [{ data: c }, { data: p }] = await Promise.all([
-      supabase.from('countries').select('*').order('sort_order', { ascending: true }),
-      supabase.from('platforms').select('*').order('sort_order', { ascending: true }),
+    const [c, p] = await Promise.all([
+      adminDb<Country[]>({ action: 'select', table: 'countries', order: { column: 'sort_order', ascending: true } }),
+      adminDb<Platform[]>({ action: 'select', table: 'platforms', order: { column: 'sort_order', ascending: true } }),
     ])
-    setCountries((c as Country[]) || [])
-    setPlatforms((p as Platform[]) || [])
+    setCountries(c.data || [])
+    setPlatforms(p.data || [])
     setLoading(false)
   }, [])
 
@@ -96,7 +96,7 @@ export default function AdminCountriesPage() {
       return
     }
     setSaving(true)
-    const payload = {
+    const values = {
       platform_id: form.platform_id,
       name: form.name.trim(),
       flag: form.flag.trim() || '🏳️',
@@ -113,14 +113,11 @@ export default function AdminCountriesPage() {
       short_description: form.short_description || null,
       is_active: form.is_active,
     }
-    let err
-    if (editId) {
-      ({ error: err } = await supabase.from('countries').update(payload).eq('id', editId))
-    } else {
-      ({ error: err } = await supabase.from('countries').insert(payload))
-    }
+    const res = editId
+      ? await adminDb({ action: 'update', table: 'countries', values, match: { id: editId } })
+      : await adminDb({ action: 'insert', table: 'countries', values })
     setSaving(false)
-    if (err) { showToast('Xəta: ' + err.message); return }
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     setModalOpen(false)
     showToast(editId ? 'Ölkə yeniləndi' : 'Ölkə əlavə edildi')
     load()
@@ -128,13 +125,12 @@ export default function AdminCountriesPage() {
 
   const remove = async (id: string) => {
     if (!confirm('Bu ölkəni silmək istədiyinizə əminsiniz?')) return
-    const { error } = await supabase.from('countries').delete().eq('id', id)
-    if (error) { showToast('Xəta: ' + error.message); return }
+    const res = await adminDb({ action: 'delete', table: 'countries', match: { id } })
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     showToast('Ölkə silindi')
     load()
   }
 
-  // Quick stock adjust (persists immediately)
   const adjustStock = async (c: Country, delta: number) => {
     const newStock = Math.max(0, c.stock_count + delta)
     let status = c.stock_status
@@ -142,7 +138,7 @@ export default function AdminCountriesPage() {
     else if (newStock <= 2) status = 'low_stock'
     else status = 'in_stock'
     setCountries(prev => prev.map(x => x.id === c.id ? { ...x, stock_count: newStock, stock_status: status } : x))
-    await supabase.from('countries').update({ stock_count: newStock, stock_status: status }).eq('id', c.id)
+    await adminDb({ action: 'update', table: 'countries', values: { stock_count: newStock, stock_status: status }, match: { id: c.id } })
   }
 
   return (
@@ -153,7 +149,6 @@ export default function AdminCountriesPage() {
         action={<AdminButton onClick={openNew}><Plus size={16} /> Yeni ölkə</AdminButton>}
       />
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-faint)' }} />
@@ -188,14 +183,12 @@ export default function AdminCountriesPage() {
                   </div>
                 </div>
 
-                {/* Quick stock */}
                 <div className="flex items-center gap-2">
                   <button onClick={() => adjustStock(c, -1)} style={{ color: 'var(--danger)' }}><MinusCircle size={18} /></button>
                   <span style={{ color: 'var(--text-primary)' }} className="font-bold w-6 text-center">{c.stock_count}</span>
                   <button onClick={() => adjustStock(c, 1)} style={{ color: 'var(--success)' }}><PlusCircle size={18} /></button>
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center gap-2">
                   <button onClick={() => openEdit(c)} className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--accent-muted)', color: 'var(--accent)' }}><Edit2 size={14} /></button>
                   <button onClick={() => remove(c.id)} className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--danger-muted)', color: 'var(--danger)' }}><Trash2 size={14} /></button>
@@ -206,7 +199,6 @@ export default function AdminCountriesPage() {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -266,7 +258,6 @@ export default function AdminCountriesPage() {
           <TextArea rows={2} value={form.short_description} onChange={(e) => setForm({ ...form, short_description: e.target.value })} />
         </Field>
 
-        {/* Toggles */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
             <span style={{ color: 'var(--text-secondary)' }} className="text-sm">Qiyməti göstər</span>

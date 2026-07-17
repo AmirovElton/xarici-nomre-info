@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Link as LinkIcon, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { Save, Link as LinkIcon } from 'lucide-react'
+import { adminDb } from '@/lib/admin-api'
 import { AdminHeader, AdminButton, Field, TextInput, AdminLoading, Toast } from '@/components/admin/ui'
+
+interface SettingsRow { id: string; site_name?: string; logo_url?: string }
 
 export default function AdminLogoPage() {
   const [loading, setLoading] = useState(true)
@@ -16,11 +18,11 @@ export default function AdminLogoPage() {
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 2500) }
 
   useEffect(() => {
-    supabase.from('site_settings').select('id, site_name, logo_url').single().then(({ data }) => {
+    adminDb<SettingsRow>({ action: 'select', table: 'site_settings', single: true }).then(({ data }) => {
       if (data) {
         setRowId(data.id)
         setSiteName(data.site_name || '')
-        setLogoUrl((data as { logo_url?: string }).logo_url || '')
+        setLogoUrl(data.logo_url || '')
       }
       setLoading(false)
     })
@@ -29,9 +31,10 @@ export default function AdminLogoPage() {
   const save = async () => {
     if (!rowId) { showToast('Ayarlar tapılmadı'); return }
     setSaving(true)
-    const { error } = await supabase.from('site_settings')
-      .update({ site_name: siteName, logo_url: logoUrl || null })
-      .eq('id', rowId)
+    const { error } = await adminDb({
+      action: 'update', table: 'site_settings', match: { id: rowId },
+      values: { site_name: siteName, logo_url: logoUrl || null },
+    })
     setSaving(false)
     showToast(error ? 'Xəta: ' + error.message : 'Yadda saxlanıldı ✓')
   }
@@ -47,7 +50,6 @@ export default function AdminLogoPage() {
       />
 
       <div className="space-y-6 max-w-2xl">
-        {/* Brand name */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4">Marka adı</h2>
           <Field label="Sayt adı">
@@ -55,7 +57,6 @@ export default function AdminLogoPage() {
           </Field>
         </div>
 
-        {/* Logo */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
             <LinkIcon size={18} style={{ color: 'var(--accent)' }} /> Logo (PNG/SVG linki)
@@ -67,7 +68,6 @@ export default function AdminLogoPage() {
             Şəkil linkini bura yapışdırın. PNG, SVG və ya WebP formatında olmalıdır.
           </p>
 
-          {/* Preview */}
           <div className="mt-5 p-4 rounded-xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
             <p style={{ color: 'var(--text-faint)' }} className="text-xs mb-3">Önbaxış:</p>
             <div className="flex items-center gap-3">
@@ -79,9 +79,7 @@ export default function AdminLogoPage() {
                   <span className="text-white font-bold text-sm">XN</span>
                 </div>
               )}
-              <span className="font-bold text-lg">
-                <span className="gradient-text">{siteName || 'XariciNomrə'}</span>
-              </span>
+              <span className="font-bold text-lg gradient-text">{siteName || 'XariciNomrəAz'}</span>
             </div>
           </div>
         </div>

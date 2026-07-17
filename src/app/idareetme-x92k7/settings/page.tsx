@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Globe, MessageCircle, Mail, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { Save, Globe, MessageCircle, Mail } from 'lucide-react'
+import { adminDb } from '@/lib/admin-api'
+import type { SiteSettings } from '@/lib/types'
 import { AdminHeader, AdminButton, Field, TextInput, TextArea, AdminLoading, Toast } from '@/components/admin/ui'
 
 export default function AdminSettingsPage() {
@@ -11,24 +12,15 @@ export default function AdminSettingsPage() {
   const [toast, setToast] = useState('')
   const [rowId, setRowId] = useState<string | null>(null)
   const [s, setS] = useState({
-    site_name: '',
-    slogan: '',
-    hero_title: '',
-    hero_subtitle: '',
-    whatsapp_number: '',
-    instagram_url: '',
-    telegram_url: '',
-    email: '',
-    working_hours: '',
-    footer_text: '',
-    default_whatsapp_message: '',
-    warning_text: '',
+    site_name: '', slogan: '', hero_title: '', hero_subtitle: '',
+    whatsapp_number: '', instagram_url: '', telegram_url: '',
+    email: '', working_hours: '', footer_text: '', default_whatsapp_message: '', warning_text: '',
   })
 
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 2500) }
 
   useEffect(() => {
-    supabase.from('site_settings').select('*').single().then(({ data }) => {
+    adminDb<SiteSettings>({ action: 'select', table: 'site_settings', single: true }).then(({ data }) => {
       if (data) {
         setRowId(data.id)
         setS({
@@ -53,20 +45,15 @@ export default function AdminSettingsPage() {
   const save = async () => {
     if (!rowId) { showToast('Ayarlar tapılmadı'); return }
     setSaving(true)
-    const { error } = await supabase.from('site_settings').update({
-      site_name: s.site_name,
-      slogan: s.slogan,
-      hero_title: s.hero_title,
-      hero_subtitle: s.hero_subtitle,
-      whatsapp_number: s.whatsapp_number,
-      instagram_url: s.instagram_url || null,
-      telegram_url: s.telegram_url || null,
-      email: s.email || null,
-      working_hours: s.working_hours,
-      footer_text: s.footer_text,
-      default_whatsapp_message: s.default_whatsapp_message,
-      warning_text: s.warning_text,
-    }).eq('id', rowId)
+    const { error } = await adminDb({
+      action: 'update', table: 'site_settings', match: { id: rowId },
+      values: {
+        site_name: s.site_name, slogan: s.slogan, hero_title: s.hero_title, hero_subtitle: s.hero_subtitle,
+        whatsapp_number: s.whatsapp_number, instagram_url: s.instagram_url || null, telegram_url: s.telegram_url || null,
+        email: s.email || null, working_hours: s.working_hours, footer_text: s.footer_text,
+        default_whatsapp_message: s.default_whatsapp_message, warning_text: s.warning_text,
+      },
+    })
     setSaving(false)
     showToast(error ? 'Xəta: ' + error.message : 'Ayarlar yadda saxlanıldı ✓')
   }
@@ -84,7 +71,6 @@ export default function AdminSettingsPage() {
       />
 
       <div className="space-y-6">
-        {/* General */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
             <Globe size={18} style={{ color: 'var(--accent)' }} /> Ümumi
@@ -97,7 +83,6 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Contact & Links */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
             <MessageCircle size={18} style={{ color: 'var(--success)' }} /> Əlaqə və Linklər
@@ -111,7 +96,6 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Messages */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
             <Mail size={18} style={{ color: '#a855f7' }} /> Mesajlar və Mətnlər
