@@ -4,40 +4,56 @@ interface IconProps {
   size?: number
 }
 
-export function WhatsAppIcon({ size = 24 }: IconProps) {
+/* WhatsApp - official style rounded app icon */
+export function WhatsAppIcon({ size = 48 }: IconProps) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="48" height="48" rx="12" fill="#25D366" />
       <path
-        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
-        fill="#25D366"
+        d="M24 10c-7.732 0-14 6.268-14 14 0 2.468.64 4.786 1.762 6.8L10 38l7.4-1.94A13.94 13.94 0 0 0 24 38c7.732 0 14-6.268 14-14s-6.268-14-14-14z"
+        fill="#fff"
       />
       <path
-        d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.29-.174-3.03.795.808-2.953-.192-.303A8 8 0 1112 20z"
+        d="M30.9 27.4c-.36-.18-2.13-1.05-2.46-1.17-.33-.12-.57-.18-.81.18-.24.36-.93 1.17-1.14 1.41-.21.24-.42.27-.78.09-.36-.18-1.52-.56-2.89-1.79-1.07-.95-1.79-2.13-2-2.49-.21-.36-.02-.55.16-.73.16-.16.36-.42.54-.63.18-.21.24-.36.36-.6.12-.24.06-.45-.03-.63-.09-.18-.81-1.95-1.11-2.67-.29-.7-.59-.6-.81-.61l-.69-.01c-.24 0-.63.09-.96.45-.33.36-1.26 1.23-1.26 3s1.29 3.48 1.47 3.72c.18.24 2.54 3.88 6.15 5.44.86.37 1.53.59 2.05.76.86.27 1.64.23 2.26.14.69-.1 2.13-.87 2.43-1.71.3-.84.3-1.56.21-1.71-.09-.15-.33-.24-.69-.42z"
         fill="#25D366"
       />
     </svg>
   )
 }
 
-export function TelegramIcon({ size = 24 }: IconProps) {
+/* Telegram - official style rounded app icon */
+export function TelegramIcon({ size = 48 }: IconProps) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="tg-grad" x1="24" y1="0" x2="24" y2="48" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#2AABEE" />
+          <stop offset="1" stopColor="#229ED9" />
+        </linearGradient>
+      </defs>
+      <rect width="48" height="48" rx="12" fill="url(#tg-grad)" />
       <path
-        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.74 3.99-1.74 6.65-2.89 7.99-3.45 3.8-1.6 4.59-1.88 5.1-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.01.06.01.24 0 .37z"
-        fill="#29B6F6"
+        d="M11.2 23.6c6.6-2.87 11-4.77 13.2-5.68 6.28-2.61 7.58-3.06 8.43-3.08.19 0 .6.04.87.26.22.18.28.42.31.6.03.17.06.57.03.87-.34 3.62-1.82 12.4-2.57 16.45-.32 1.71-.94 2.29-1.55 2.34-1.31.12-2.31-.87-3.58-1.7-1.99-1.3-3.11-2.11-5.04-3.39-2.23-1.47-.79-2.28.49-3.6.33-.35 6.13-5.62 6.24-6.1.01-.06.03-.28-.11-.4-.13-.11-.33-.07-.48-.04-.2.05-3.39 2.15-9.55 6.32-.9.62-1.72.92-2.46.9-.81-.02-2.36-.46-3.52-.83-1.42-.46-2.55-.71-2.45-1.5.05-.41.62-.83 1.7-1.26z"
+        fill="#fff"
       />
     </svg>
   )
 }
 
-export function GlobalIcon({ size = 24 }: IconProps) {
+/* Other platforms - modern globe app icon */
+export function GlobalIcon({ size = 48 }: IconProps) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="9" stroke="var(--text-secondary)" strokeWidth="1.5" />
-      <ellipse cx="12" cy="12" rx="4" ry="9" stroke="var(--text-secondary)" strokeWidth="1.5" />
-      <path d="M3 12h18" stroke="var(--text-secondary)" strokeWidth="1.5" />
-      <path d="M4.5 7.5h15" stroke="var(--text-secondary)" strokeWidth="1.5" />
-      <path d="M4.5 16.5h15" stroke="var(--text-secondary)" strokeWidth="1.5" />
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gl-grad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#7C6CFF" />
+          <stop offset="1" stopColor="#5B4FE0" />
+        </linearGradient>
+      </defs>
+      <rect width="48" height="48" rx="12" fill="url(#gl-grad)" />
+      <circle cx="24" cy="24" r="10" stroke="#fff" strokeWidth="1.8" />
+      <ellipse cx="24" cy="24" rx="4.2" ry="10" stroke="#fff" strokeWidth="1.8" />
+      <path d="M14 24h20M15.5 19h17M15.5 29h17" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   )
 }

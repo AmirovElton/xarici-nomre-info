@@ -24,10 +24,13 @@ export default function FAQSection() {
 
   return (
     <div className="space-y-3">
-      <div className="glass-card p-4 mb-4 bg-indigo-50/30 border-indigo-100/50">
+      <div
+        className="p-4 mb-4 rounded-2xl"
+        style={{ background: 'var(--bg-card)', border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)' }}
+      >
         <div className="flex gap-3">
-          <HelpCircle size={18} className="text-indigo-500 flex-shrink-0" />
-          <p className="text-sm text-indigo-700">
+          <HelpCircle size={18} style={{ color: 'var(--accent)' }} className="flex-shrink-0" />
+          <p style={{ color: 'var(--text-secondary)' }} className="text-sm">
             Əlavə suallarınız üçün WhatsApp vasitəsilə əlaqə saxlaya bilərsiniz.
           </p>
         </div>
@@ -36,20 +39,21 @@ export default function FAQSection() {
       {faqs.map((faq, index) => {
         const isOpen = openIndex === index
         return (
-          <div key={index} className="glass-card overflow-hidden">
+          <div key={index} className="theme-card overflow-hidden">
             <button
               onClick={() => setOpenIndex(isOpen ? null : index)}
               className="w-full flex items-center gap-3 p-4 text-left"
             >
-              <span className="flex-1 font-medium text-gray-900 text-sm">{faq.q}</span>
+              <span style={{ color: 'var(--text-primary)' }} className="flex-1 font-semibold text-sm">{faq.q}</span>
               <ChevronDown
                 size={18}
-                className={cn('text-gray-400 transition-transform flex-shrink-0', isOpen && 'rotate-180')}
+                style={{ color: 'var(--text-muted)' }}
+                className={cn('transition-transform flex-shrink-0', isOpen && 'rotate-180')}
               />
             </button>
             {isOpen && (
               <div className="px-4 pb-4 pt-0 animate-fade-in">
-                <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
+                <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed">{faq.a}</p>
               </div>
             )}
           </div>

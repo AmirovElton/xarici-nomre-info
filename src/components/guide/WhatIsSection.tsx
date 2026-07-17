@@ -42,12 +42,15 @@ export default function WhatIsSection() {
 
   return (
     <div className="space-y-3">
-      {/* Important Warning */}
-      <div className="glass-card p-4 mb-6 bg-red-50/30 border-red-100/50">
+      {/* Important Warning - dark theme */}
+      <div
+        className="p-4 mb-6 rounded-2xl"
+        style={{ background: 'var(--bg-card)', border: '1px solid color-mix(in srgb, var(--danger) 25%, transparent)' }}
+      >
         <div className="flex gap-3">
-          <AlertTriangle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700 leading-relaxed">
-            Nömrələrin qanunsuz fəaliyyət, dələduzluq, spam, icazəsiz reklam və platforma qaydalarını 
+          <AlertTriangle size={18} style={{ color: 'var(--danger)' }} className="flex-shrink-0 mt-0.5" />
+          <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed">
+            Nömrələrin qanunsuz fəaliyyət, dələduzluq, spam, icazəsiz reklam və platforma qaydalarını
             pozmaq üçün istifadəsi qadağandır. Heç bir nömrə və ya hesab üçün 100% bloklanmama zəmanəti verilmir.
           </p>
         </div>
@@ -57,23 +60,27 @@ export default function WhatIsSection() {
         const Icon = item.icon
         const isOpen = openIndex === index
         return (
-          <div key={index} className="glass-card overflow-hidden">
+          <div key={index} className="theme-card overflow-hidden">
             <button
               onClick={() => setOpenIndex(isOpen ? null : index)}
               className="w-full flex items-center gap-3 p-4 text-left"
             >
-              <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                <Icon size={18} className="text-indigo-600" />
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'var(--accent-muted)' }}
+              >
+                <Icon size={18} style={{ color: 'var(--accent)' }} />
               </div>
-              <span className="flex-1 font-medium text-gray-900 text-sm">{item.question}</span>
+              <span style={{ color: 'var(--text-primary)' }} className="flex-1 font-semibold text-sm">{item.question}</span>
               <ChevronDown
                 size={18}
-                className={cn('text-gray-400 transition-transform', isOpen && 'rotate-180')}
+                style={{ color: 'var(--text-muted)' }}
+                className={cn('transition-transform', isOpen && 'rotate-180')}
               />
             </button>
             {isOpen && (
               <div className="px-4 pb-4 pt-0 ml-12 animate-fade-in">
-                <p className="text-sm text-gray-600 leading-relaxed">{item.answer}</p>
+                <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed">{item.answer}</p>
               </div>
             )}
           </div>

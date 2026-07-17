@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Info, X, Star, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Star, Clock } from 'lucide-react'
 
 interface CountryData {
   id: string
@@ -29,6 +29,7 @@ interface CountryCardProps {
 
 export default function CountryCard({ country }: CountryCardProps) {
   const [showModal, setShowModal] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   const isAvailable = country.stock_status === 'in_stock' || country.stock_status === 'low_stock'
 
@@ -40,20 +41,36 @@ export default function CountryCard({ country }: CountryCardProps) {
 
   const stockBadge = getStockBadge()
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('az-AZ', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+  // Smooth open/close animation control
+  const openModal = () => {
+    setShowModal(true)
+    requestAnimationFrame(() => setVisible(true))
   }
+  const closeModal = () => {
+    setVisible(false)
+    setTimeout(() => setShowModal(false), 220)
+  }
+
+  // Lock body scroll while modal open
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = '' }
+    }
+  }, [showModal])
+
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('az-AZ', {
+      day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    })
 
   return (
     <>
-      {/* Compact Card */}
-      <div className="theme-card p-4 flex items-center justify-between gap-3">
+      {/* Compact Card - whole card clickable */}
+      <button
+        onClick={openModal}
+        className="theme-card p-4 flex items-center justify-between gap-3 w-full text-left cursor-pointer hover:scale-[1.01] transition-transform"
+      >
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <span className="text-2xl flex-shrink-0">{country.flag}</span>
           <div className="flex-1 min-w-0">
@@ -61,12 +78,8 @@ export default function CountryCard({ country }: CountryCardProps) {
               <span style={{ color: 'var(--text-primary)' }} className="font-semibold text-sm truncate">
                 {country.name}
               </span>
-              <span style={{ color: 'var(--text-muted)' }} className="text-xs">
-                {country.country_code}
-              </span>
-              <span style={{ color: 'var(--text-faint)' }} className="text-xs">
-                {country.platform_name}
-              </span>
+              <span style={{ color: 'var(--text-muted)' }} className="text-xs">{country.country_code}</span>
+              <span style={{ color: 'var(--text-faint)' }} className="text-xs">{country.platform_name}</span>
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span className={stockBadge.className}>{stockBadge.label}</span>
@@ -74,66 +87,64 @@ export default function CountryCard({ country }: CountryCardProps) {
             </div>
           </div>
         </div>
-
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex-shrink-0">
           {country.show_price && country.price ? (
-            <span style={{ color: 'var(--success)' }} className="font-bold text-sm">
-              {country.price} AZN
-            </span>
+            <span style={{ color: 'var(--success)' }} className="font-bold text-sm">{country.price} AZN</span>
           ) : (
-            <span style={{ color: 'var(--text-faint)' }} className="text-xs">
-              Soruşun
-            </span>
+            <span style={{ color: 'var(--text-faint)' }} className="text-xs">Soruşun</span>
           )}
-          <button
-            onClick={() => setShowModal(true)}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
-            style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}
-          >
-            <Info size={14} />
-          </button>
         </div>
-      </div>
+      </button>
 
-      {/* Modal / Bottom Sheet */}
+      {/* Centered Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center" onClick={() => setShowModal(false)}>
-          {/* Dark backdrop */}
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-
-          {/* Modal content */}
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          onClick={closeModal}
+        >
+          {/* Backdrop */}
           <div
-            className="relative w-full sm:max-w-md mx-auto sm:mx-4 rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto"
-            style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)' }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-200"
+            style={{ opacity: visible ? 1 : 0 }}
+          />
+
+          {/* Modal content - centered, compact, smooth */}
+          <div
+            className="relative w-full max-w-sm rounded-3xl p-6 max-h-[85vh] overflow-y-auto transition-all duration-200"
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              boxShadow: 'var(--shadow-lg)',
+              opacity: visible ? 1 : 0,
+              transform: visible ? 'scale(1) translateY(0)' : 'scale(0.94) translateY(8px)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center"
+              onClick={closeModal}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
               style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}
             >
               <X size={16} />
             </button>
 
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-4xl">{country.flag}</span>
-              <div>
-                <h3 style={{ color: 'var(--text-primary)' }} className="font-bold text-lg">{country.name}</h3>
-                <p style={{ color: 'var(--text-muted)' }} className="text-sm">
-                  {country.country_code} &middot; {country.platform_name}
-                </p>
-              </div>
+            {/* Centered header: flag, name, code */}
+            <div className="flex flex-col items-center text-center mb-5 pt-1">
+              <span className="text-5xl mb-2">{country.flag}</span>
+              <h3 style={{ color: 'var(--text-primary)' }} className="font-bold text-xl">{country.name}</h3>
+              <p style={{ color: 'var(--text-muted)' }} className="text-sm mt-0.5">
+                {country.country_code} &middot; {country.platform_name}
+              </p>
               {country.is_premium && (
-                <div className="ml-auto">
-                  <Star size={18} style={{ color: 'var(--warning)' }} fill="var(--warning)" />
-                </div>
+                <span className="badge-accent mt-2 inline-flex items-center gap-1">
+                  <Star size={11} fill="currentColor" /> Premium
+                </span>
               )}
             </div>
 
             {/* Details */}
-            <div className="space-y-3 mb-5">
+            <div className="space-y-1 mb-4">
               <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <span style={{ color: 'var(--text-muted)' }} className="text-sm">Stok</span>
                 <span className={stockBadge.className}>
@@ -151,15 +162,9 @@ export default function CountryCard({ country }: CountryCardProps) {
                 </div>
               )}
               {country.recommended_use && (
-                <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                  <span style={{ color: 'var(--text-muted)' }} className="text-sm">Tövsiyə</span>
-                  <span style={{ color: 'var(--text-secondary)' }} className="text-sm text-right max-w-[60%]">{country.recommended_use}</span>
-                </div>
-              )}
-              {country.short_description && (
-                <div className="py-2" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                  <span style={{ color: 'var(--text-muted)' }} className="text-sm block mb-1">Açıqlama</span>
-                  <p style={{ color: 'var(--text-secondary)' }} className="text-sm">{country.short_description}</p>
+                <div className="flex justify-between items-center py-2 gap-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <span style={{ color: 'var(--text-muted)' }} className="text-sm flex-shrink-0">Tövsiyə</span>
+                  <span style={{ color: 'var(--text-secondary)' }} className="text-sm text-right">{country.recommended_use}</span>
                 </div>
               )}
               {country.show_price && country.price && (
@@ -170,8 +175,14 @@ export default function CountryCard({ country }: CountryCardProps) {
               )}
             </div>
 
+            {country.short_description && (
+              <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed mb-4 text-center">
+                {country.short_description}
+              </p>
+            )}
+
             {/* Last updated */}
-            <div className="flex items-center gap-1.5 mb-5" style={{ color: 'var(--text-faint)' }}>
+            <div className="flex items-center justify-center gap-1.5 mb-5" style={{ color: 'var(--text-faint)' }}>
               <Clock size={12} />
               <span className="text-xs">Son yenilənmə: {formatDate(country.last_updated)}</span>
             </div>
