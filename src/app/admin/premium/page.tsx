@@ -1,86 +1,91 @@
 'use client'
 
-import { useState } from 'react'
-import { Star, Edit2, ToggleLeft, ToggleRight } from 'lucide-react'
-
-const initialPremium = [
-  { id: '1', name: 'Böyük Britaniya', flag: '🇬🇧', platform: 'WhatsApp', stability: 'Yüksək', featured: true, showOnHome: true },
-  { id: '2', name: 'ABŞ', flag: '🇺🇸', platform: 'WhatsApp', stability: 'Yüksək', featured: true, showOnHome: true },
-  { id: '3', name: 'Böyük Britaniya', flag: '🇬🇧', platform: 'Telegram', stability: 'Yüksək', featured: false, showOnHome: false },
-]
+import { useState, useEffect, useCallback } from 'react'
+import { Star, Home } from 'lucide-react'
+import { supabase } from '@/lib/supabase/client'
+import type { Country, Platform } from '@/lib/types'
+import { AdminHeader, AdminLoading, AdminEmpty, Toast, Toggle } from '@/components/admin/ui'
 
 export default function AdminPremiumPage() {
-  const [items, setItems] = useState(initialPremium)
+  const [countries, setCountries] = useState<Country[]>([])
+  const [platforms, setPlatforms] = useState<Platform[]>([])
+  const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState('')
 
-  const toggleFeatured = (id: string) => {
-    setItems(prev => prev.map(i =>
-      i.id === id ? { ...i, featured: !i.featured } : i
-    ))
+  const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 2500) }
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    const [{ data: c }, { data: p }] = await Promise.all([
+      supabase.from('countries').select('*').order('sort_order', { ascending: true }),
+      supabase.from('platforms').select('*'),
+    ])
+    setCountries((c as Country[]) || [])
+    setPlatforms((p as Platform[]) || [])
+    setLoading(false)
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const platformName = (id: string) => platforms.find(p => p.id === id)?.name || '—'
+
+  const togglePremium = async (c: Country) => {
+    const next = !c.is_premium
+    setCountries(prev => prev.map(x => x.id === c.id ? { ...x, is_premium: next } : x))
+    await supabase.from('countries').update({ is_premium: next }).eq('id', c.id)
+    showToast(next ? 'Premium edildi' : 'Premium ləğv edildi')
   }
 
-  const toggleHome = (id: string) => {
-    setItems(prev => prev.map(i =>
-      i.id === id ? { ...i, showOnHome: !i.showOnHome } : i
-    ))
+  const togglePopular = async (c: Country) => {
+    const next = !c.is_popular
+    setCountries(prev => prev.map(x => x.id === c.id ? { ...x, is_popular: next } : x))
+    await supabase.from('countries').update({ is_popular: next }).eq('id', c.id)
+    showToast(next ? 'Ən çox seçilən edildi' : 'Ləğv edildi')
   }
+
+  const premiumList = countries.filter(c => c.is_premium)
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Premium Seçimlər</h1>
-        <p className="text-sm text-gray-500">
-          Premium olaraq işarələnmiş ölkələr
+      <AdminHeader title="Premium Seçimlər" subtitle={`${premiumList.length} premium nömrə`} />
+
+      <div className="theme-card p-4 mb-6" style={{ border: '1px solid color-mix(in srgb, var(--warning) 25%, transparent)' }}>
+        <p style={{ color: 'var(--text-secondary)' }} className="text-sm flex items-start gap-2">
+          <Star size={16} style={{ color: 'var(--warning)' }} className="flex-shrink-0 mt-0.5" />
+          Hər ölkəni premium və ya "ən çox seçilən" kimi işarələyin. Premium ölkələr Premium səhifəsində göstərilir.
         </p>
       </div>
 
-      <div className="space-y-3">
-        {items.map((item) => (
-          <div key={item.id} className="bg-white rounded-2xl border p-5">
-            <div className="flex items-center gap-4">
-              <span className="text-3xl">{item.flag}</span>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">
-                  {item.name}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {item.platform} &middot; Stabilik: {item.stability}
-                </p>
+      {loading ? <AdminLoading /> : countries.length === 0 ? (
+        <AdminEmpty text="Ölkə yoxdur. Əvvəlcə Ölkələr bölməsində ölkə əlavə edin." />
+      ) : (
+        <div className="space-y-3">
+          {countries.map((c) => (
+            <div key={c.id} className="theme-card p-4 flex items-center gap-4 flex-wrap">
+              <span className="text-2xl">{c.flag}</span>
+              <div className="flex-1 min-w-[120px]">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span style={{ color: 'var(--text-primary)' }} className="font-semibold">{c.name}</span>
+                  <span style={{ color: 'var(--text-muted)' }} className="text-xs">{c.country_code}</span>
+                  <span className="badge-accent">{platformName(c.platform_id)}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Seçilmiş</p>
-                  <button onClick={() => toggleFeatured(item.id)}>
-                    {item.featured
-                      ? <ToggleRight size={24} className="text-amber-500" />
-                      : <ToggleLeft size={24} className="text-gray-300" />
-                    }
-                  </button>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <span style={{ color: 'var(--text-muted)' }} className="text-xs flex items-center gap-1"><Star size={12} /> Premium</span>
+                  <Toggle checked={c.is_premium} onChange={() => togglePremium(c)} />
                 </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Ana səhifə</p>
-                  <button onClick={() => toggleHome(item.id)}>
-                    {item.showOnHome
-                      ? <ToggleRight size={24} className="text-green-500" />
-                      : <ToggleLeft size={24} className="text-gray-300" />
-                    }
-                  </button>
+                <div className="flex items-center gap-2">
+                  <span style={{ color: 'var(--text-muted)' }} className="text-xs flex items-center gap-1"><Home size={12} /> Populyar</span>
+                  <Toggle checked={c.is_popular} onChange={() => togglePopular(c)} />
                 </div>
-                <button className="p-2 rounded-lg hover:bg-indigo-50 text-indigo-600">
-                  <Edit2 size={16} />
-                </button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      <div className="mt-6 p-4 bg-amber-50 rounded-2xl border border-amber-100">
-        <p className="text-sm text-amber-700">
-          <Star size={14} className="inline mr-1" />
-          Premium seçimlər Ölkələr bölməsindən idarə olunur. Ölkəni premium
-          olaraq işarələdikdə burada görünəcək.
-        </p>
-      </div>
+      <Toast message={toast} />
     </div>
   )
 }

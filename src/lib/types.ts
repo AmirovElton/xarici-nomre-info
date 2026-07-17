@@ -89,6 +89,7 @@ export interface InfoArticle {
 export interface SiteSettings {
   id: string
   site_name: string
+  logo_url: string | null
   slogan: string
   hero_title: string
   hero_subtitle: string

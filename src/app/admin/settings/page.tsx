@@ -1,232 +1,130 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Globe, MessageCircle, Mail, CheckCircle, Loader2 } from 'lucide-react'
+import { Save, Globe, MessageCircle, Mail, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
+import { AdminHeader, AdminButton, Field, TextInput, TextArea, AdminLoading, Toast } from '@/components/admin/ui'
 
 export default function AdminSettingsPage() {
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [settings, setSettings] = useState({
-    siteName: 'XariciNomrəAz',
+  const [toast, setToast] = useState('')
+  const [rowId, setRowId] = useState<string | null>(null)
+  const [s, setS] = useState({
+    site_name: '',
     slogan: '',
-    heroTitle: '',
-    heroSubtitle: '',
-    whatsappNumber: '994501234567',
-    instagramUrl: '',
-    telegramUrl: '',
+    hero_title: '',
+    hero_subtitle: '',
+    whatsapp_number: '',
+    instagram_url: '',
+    telegram_url: '',
     email: '',
-    workingHours: '09:00 - 22:00',
-    defaultWhatsappMessage: '',
-    warningText: '',
+    working_hours: '',
+    footer_text: '',
+    default_whatsapp_message: '',
+    warning_text: '',
   })
 
+  const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 2500) }
+
   useEffect(() => {
-    supabase
-      .from('site_settings')
-      .select('*')
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setSettings({
-            siteName: data.site_name || '',
-            slogan: data.slogan || '',
-            heroTitle: data.hero_title || '',
-            heroSubtitle: data.hero_subtitle || '',
-            whatsappNumber: data.whatsapp_number || '',
-            instagramUrl: data.instagram_url || '',
-            telegramUrl: data.telegram_url || '',
-            email: data.email || '',
-            workingHours: data.working_hours || '',
-            defaultWhatsappMessage: data.default_whatsapp_message || '',
-            warningText: data.warning_text || '',
-          })
-        }
-      })
+    supabase.from('site_settings').select('*').single().then(({ data }) => {
+      if (data) {
+        setRowId(data.id)
+        setS({
+          site_name: data.site_name || '',
+          slogan: data.slogan || '',
+          hero_title: data.hero_title || '',
+          hero_subtitle: data.hero_subtitle || '',
+          whatsapp_number: data.whatsapp_number || '',
+          instagram_url: data.instagram_url || '',
+          telegram_url: data.telegram_url || '',
+          email: data.email || '',
+          working_hours: data.working_hours || '',
+          footer_text: data.footer_text || '',
+          default_whatsapp_message: data.default_whatsapp_message || '',
+          warning_text: data.warning_text || '',
+        })
+      }
+      setLoading(false)
+    })
   }, [])
 
-  const handleSave = async () => {
+  const save = async () => {
+    if (!rowId) { showToast('Ayarlar tapılmadı'); return }
     setSaving(true)
-    const { data: existing } = await supabase.from('site_settings').select('id').single()
-    if (existing) {
-      await supabase.from('site_settings').update({
-        site_name: settings.siteName,
-        slogan: settings.slogan,
-        hero_title: settings.heroTitle,
-        hero_subtitle: settings.heroSubtitle,
-        whatsapp_number: settings.whatsappNumber,
-        instagram_url: settings.instagramUrl || null,
-        telegram_url: settings.telegramUrl || null,
-        email: settings.email || null,
-        working_hours: settings.workingHours,
-        default_whatsapp_message: settings.defaultWhatsappMessage,
-        warning_text: settings.warningText,
-      }).eq('id', existing.id)
-    }
+    const { error } = await supabase.from('site_settings').update({
+      site_name: s.site_name,
+      slogan: s.slogan,
+      hero_title: s.hero_title,
+      hero_subtitle: s.hero_subtitle,
+      whatsapp_number: s.whatsapp_number,
+      instagram_url: s.instagram_url || null,
+      telegram_url: s.telegram_url || null,
+      email: s.email || null,
+      working_hours: s.working_hours,
+      footer_text: s.footer_text,
+      default_whatsapp_message: s.default_whatsapp_message,
+      warning_text: s.warning_text,
+    }).eq('id', rowId)
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    showToast(error ? 'Xəta: ' + error.message : 'Ayarlar yadda saxlanıldı ✓')
   }
 
-  const handleChange = (key: string, value: string) => {
-    setSettings(prev => ({ ...prev, [key]: value }))
-  }
+  const set = (k: string, v: string) => setS(prev => ({ ...prev, [k]: v }))
+
+  if (loading) return <AdminLoading />
 
   return (
     <div>
-      {/* Page Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 style={{ color: 'var(--text-primary)' }} className="text-2xl font-bold">Sayt Ayarları</h1>
-          <p style={{ color: 'var(--text-faint)' }} className="text-sm">Ümumi ayarlar</p>
-        </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="btn-primary flex items-center gap-2 px-4 py-2 text-sm disabled:opacity-50"
-        >
-          {saving ? <Loader2 size={16} className="animate-spin" /> : saved ? <CheckCircle size={16} /> : <Save size={16} />}
-          {saving ? 'Saxlanılır...' : saved ? 'Saxlanıldı!' : 'Yadda saxla'}
-        </button>
-      </div>
-
-      {/* Success feedback */}
-      {saved && (
-        <div
-          className="mb-4 p-3 rounded-xl text-sm flex items-center gap-2"
-          style={{ background: 'color-mix(in srgb, var(--success) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--success) 20%, transparent)', color: 'var(--success)' }}
-        >
-          <CheckCircle size={16} /> Ayarlar uğurla saxlanıldı!
-        </div>
-      )}
+      <AdminHeader
+        title="Sayt Ayarları"
+        subtitle="Ümumi məlumat, əlaqə linkləri və mesajlar"
+        action={<AdminButton onClick={save} loading={saving}><Save size={16} /> Yadda saxla</AdminButton>}
+      />
 
       <div className="space-y-6">
-        {/* General Settings Section */}
+        {/* General */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
             <Globe size={18} style={{ color: 'var(--accent)' }} /> Ümumi
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Sayt adı</label>
-              <input
-                type="text"
-                value={settings.siteName}
-                onChange={(e) => handleChange('siteName', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Slogan</label>
-              <input
-                type="text"
-                value={settings.slogan}
-                onChange={(e) => handleChange('slogan', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Hero başlığı</label>
-              <input
-                type="text"
-                value={settings.heroTitle}
-                onChange={(e) => handleChange('heroTitle', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Hero alt mətni</label>
-              <textarea
-                value={settings.heroSubtitle}
-                onChange={(e) => handleChange('heroSubtitle', e.target.value)}
-                rows={2}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm resize-none"
-              />
-            </div>
+            <Field label="Sayt adı"><TextInput value={s.site_name} onChange={(e) => set('site_name', e.target.value)} /></Field>
+            <Field label="Slogan"><TextInput value={s.slogan} onChange={(e) => set('slogan', e.target.value)} /></Field>
+            <div className="md:col-span-2"><Field label="Hero başlığı"><TextInput value={s.hero_title} onChange={(e) => set('hero_title', e.target.value)} /></Field></div>
+            <div className="md:col-span-2"><Field label="Hero alt mətni"><TextArea rows={2} value={s.hero_subtitle} onChange={(e) => set('hero_subtitle', e.target.value)} /></Field></div>
           </div>
         </div>
 
-        {/* Contact Settings Section */}
+        {/* Contact & Links */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
-            <MessageCircle size={18} style={{ color: 'var(--success)' }} /> Əlaqə
+            <MessageCircle size={18} style={{ color: 'var(--success)' }} /> Əlaqə və Linklər
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">WhatsApp</label>
-              <input
-                type="text"
-                value={settings.whatsappNumber}
-                onChange={(e) => handleChange('whatsappNumber', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Instagram</label>
-              <input
-                type="text"
-                value={settings.instagramUrl}
-                onChange={(e) => handleChange('instagramUrl', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Telegram</label>
-              <input
-                type="text"
-                value={settings.telegramUrl}
-                onChange={(e) => handleChange('telegramUrl', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">E-poçt</label>
-              <input
-                type="email"
-                value={settings.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">İş saatları</label>
-              <input
-                type="text"
-                value={settings.workingHours}
-                onChange={(e) => handleChange('workingHours', e.target.value)}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm"
-              />
-            </div>
+            <Field label="WhatsApp nömrəsi"><TextInput value={s.whatsapp_number} onChange={(e) => set('whatsapp_number', e.target.value)} placeholder="994501234567" /></Field>
+            <Field label="Instagram linki"><TextInput value={s.instagram_url} onChange={(e) => set('instagram_url', e.target.value)} placeholder="https://instagram.com/..." /></Field>
+            <Field label="Telegram linki"><TextInput value={s.telegram_url} onChange={(e) => set('telegram_url', e.target.value)} placeholder="https://t.me/..." /></Field>
+            <Field label="E-poçt"><TextInput value={s.email} onChange={(e) => set('email', e.target.value)} placeholder="info@..." /></Field>
+            <Field label="İş saatları"><TextInput value={s.working_hours} onChange={(e) => set('working_hours', e.target.value)} placeholder="09:00 - 22:00" /></Field>
           </div>
         </div>
 
-        {/* Messages Section */}
+        {/* Messages */}
         <div className="theme-card p-6">
           <h2 style={{ color: 'var(--text-primary)' }} className="font-bold mb-4 flex items-center gap-2">
-            <Mail size={18} style={{ color: '#a855f7' }} /> Mesajlar
+            <Mail size={18} style={{ color: '#a855f7' }} /> Mesajlar və Mətnlər
           </h2>
           <div className="space-y-4">
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Standart WhatsApp mesajı</label>
-              <textarea
-                value={settings.defaultWhatsappMessage}
-                onChange={(e) => handleChange('defaultWhatsappMessage', e.target.value)}
-                rows={2}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm resize-none"
-              />
-            </div>
-            <div>
-              <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Xəbərdarlıq mətni</label>
-              <textarea
-                value={settings.warningText}
-                onChange={(e) => handleChange('warningText', e.target.value)}
-                rows={3}
-                className="theme-input w-full px-4 py-2.5 rounded-xl text-sm resize-none"
-              />
-            </div>
+            <Field label="WhatsApp hazır mesajı"><TextArea rows={2} value={s.default_whatsapp_message} onChange={(e) => set('default_whatsapp_message', e.target.value)} /></Field>
+            <Field label="Xəbərdarlıq mətni"><TextArea rows={3} value={s.warning_text} onChange={(e) => set('warning_text', e.target.value)} /></Field>
+            <Field label="Footer mətni"><TextInput value={s.footer_text} onChange={(e) => set('footer_text', e.target.value)} /></Field>
           </div>
         </div>
       </div>
+
+      <Toast message={toast} />
     </div>
   )
 }
