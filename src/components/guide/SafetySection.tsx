@@ -2,95 +2,69 @@
 
 import { AlertTriangle, XCircle, CheckCircle, Clock } from 'lucide-react'
 
-const dontDoList = [
-  'Çox sayda şəxsə mesaj göndərmək',
-  'Kütləvi zəng etmək',
-  'Çoxlu qrupa daxil olmaq',
-  'Tanımadığınız şəxsləri ardıcıl əlavə etmək',
-  'Eyni mətni çox sayda şəxsə göndərmək',
-  'Reklam və spam mesajları göndərmək',
-  'Profil məlumatlarını dəfələrlə dəyişmək',
-  'Tez-tez cihaz dəyişmək',
-  'VPN və IP ünvanını davamlı dəyişmək',
-  'Hesabı başqa şəxslərlə paylaşmaq',
-  'Avtomatlaşdırılmış proqramlardan istifadə etmək',
-  'Çox sayda kanal və qrupa sürətlə qoşulmaq',
-]
-
-const doList = [
-  'Profil şəklini əlavə etmək',
-  'Ad və qısa məlumat bölməsini doldurmaq',
-  'Bir neçə etibarlı kontaktla normal ünsiyyət qurmaq',
-  'Hesabın aktivliyini tədricən artırmaq',
-  'Platformanın xidmət şərtlərinə əməl etmək',
-  'Eyni cihazdan istifadə etmək',
-  'Hesabı normal insan davranışına uyğun istifadə etmək',
-  'İki addımlı doğrulamanı aktiv etmək',
-  'Şəxsi e-poçt ünvanını əlavə etmək',
-]
+const dontDo = ['Çox sayda şəxsə mesaj göndərmək', 'Kütləvi zəng etmək', 'Çoxlu qrupa daxil olmaq', 'Tanımadığınız şəxsləri əlavə etmək', 'Eyni mətni çox göndərmək', 'Spam/reklam mesajları', 'Profili dəfələrlə dəyişmək', 'Tez-tez cihaz dəyişmək', 'VPN-i davamlı dəyişmək', 'Hesabı paylaşmaq', 'Avtomatlaşdırılmış proqramlar', 'Sürətlə çoxlu kanala qoşulmaq']
+const doList = ['Profil şəkli əlavə edin', 'Ad bölməsini doldurun', 'Etibarlı kontaktlarla yazışın', 'Aktivliyi tədricən artırın', 'Xidmət şərtlərinə əməl edin', 'Eyni cihazdan istifadə edin', 'Normal davranış nümayiş etdirin', 'İki addımlı doğrulama aktiv edin', 'E-poçt əlavə edin']
 
 export default function SafetySection() {
   return (
-    <div className="space-y-6">
-      {/* Warning Banner */}
-      <div className="glass-card p-5 bg-amber-50/50 border-amber-200/50">
+    <div className="space-y-5">
+      {/* Warning banner */}
+      <div className="p-5 rounded-2xl" style={{ background: 'var(--warning-muted)', border: '1px solid rgba(251,191,36,0.15)' }}>
         <div className="flex gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <Clock size={20} className="text-amber-600" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(251,191,36,0.15)' }}>
+            <Clock size={20} style={{ color: 'var(--warning)' }} />
           </div>
           <div>
-            <h3 className="font-bold text-amber-800 mb-1">İlk 24 saat hesabın təhlükəsizliyi üçün vacibdir</h3>
-            <p className="text-sm text-amber-700 leading-relaxed">
-              Bu müddət mütləq zəmanət kimi yox, tövsiyə olunan minimum uyğunlaşma müddəti kimi nəzərdə tutulur. 
-              İlk saatlarda edilən hərəkətlər hesabın gələcək stabilliyinə birbaşa təsir edə bilər.
+            <h3 className="font-bold mb-1" style={{ color: 'var(--warning)' }}>İlk 24 saat vacibdir</h3>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              Bu müddət tövsiyə olunan minimum uyğunlaşma müddətidir. İlk saatlarda edilən hərəkətlər hesabın stabilliyinə təsir edir.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Don't Do */}
-      <div className="glass-card p-5">
+      {/* Don't do */}
+      <div className="theme-card p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-            <XCircle size={16} className="text-red-600" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--danger-muted)' }}>
+            <XCircle size={16} style={{ color: 'var(--danger)' }} />
           </div>
-          <h3 className="font-bold text-gray-900">İlk 24 saat ərzində edilməməli olanlar</h3>
+          <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>Edilməməli olanlar</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {dontDoList.map((item, i) => (
-            <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-red-50/50 border border-red-100">
-              <XCircle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
-              <span className="text-xs text-gray-700">{item}</span>
+          {dontDo.map((item, i) => (
+            <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl" style={{ background: 'var(--danger-muted)', border: '1px solid rgba(239,68,68,0.1)' }}>
+              <XCircle size={13} style={{ color: 'var(--danger)' }} className="mt-0.5 flex-shrink-0" />
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{item}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Do */}
-      <div className="glass-card p-5">
+      <div className="theme-card p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-            <CheckCircle size={16} className="text-green-600" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--success-muted)' }}>
+            <CheckCircle size={16} style={{ color: 'var(--success)' }} />
           </div>
-          <h3 className="font-bold text-gray-900">İlk 24 saat ərzində tövsiyə olunanlar</h3>
+          <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>Tövsiyə olunanlar</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {doList.map((item, i) => (
-            <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl bg-green-50/50 border border-green-100">
-              <CheckCircle size={14} className="text-green-400 mt-0.5 flex-shrink-0" />
-              <span className="text-xs text-gray-700">{item}</span>
+            <div key={i} className="flex items-start gap-2 p-2.5 rounded-xl" style={{ background: 'var(--success-muted)', border: '1px solid rgba(34,197,94,0.1)' }}>
+              <CheckCircle size={13} style={{ color: 'var(--success)' }} className="mt-0.5 flex-shrink-0" />
+              <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{item}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Final Note */}
-      <div className="glass-card p-4 bg-gray-50/50 border-gray-200/50">
+      {/* Disclaimer */}
+      <div className="p-4 rounded-2xl" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-default)' }}>
         <div className="flex gap-3">
-          <AlertTriangle size={16} className="text-gray-500 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-gray-600 leading-relaxed">
-            Heç bir nömrə və ya hesab üçün 100% bloklanmama zəmanəti verilmir. Hesabın təhlükəsizliyi 
-            istifadə formasından, platformanın daxili yoxlamalarından və istifadəçinin davranışından asılıdır.
+          <AlertTriangle size={16} style={{ color: 'var(--text-faint)' }} className="flex-shrink-0 mt-0.5" />
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Heç bir nömrə üçün 100% bloklanmama zəmanəti verilmir. Hesabın təhlükəsizliyi istifadə formasından asılıdır.
           </p>
         </div>
       </div>

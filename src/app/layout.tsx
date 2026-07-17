@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   keywords: 'xarici nömrə, virtual nömrə, whatsapp nömrə, telegram nömrə, xarici sim',
   openGraph: {
     title: 'XariciNomrəAz - Xarici Virtual Nömrələr',
-    description: 'Sifarişdən əvvəl hər şeyi öyrənin. Platformaya uyğun ölkələr, stok vəziyyəti və istifadə qaydaları.',
+    description: 'Sifarişdən əvvəl hər şeyi öyrənin.',
     type: 'website',
   },
 }
@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="az">
-      <body className="gradient-bg min-h-screen">
+      <body>
         <Header />
         <main className="pt-20 pb-24 md:pb-8">
           {children}

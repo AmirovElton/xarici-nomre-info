@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Smartphone, BookOpen, Star, MessageSquare } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const navItems = [
   { label: 'Ana səhifə', href: '/', icon: Home },
@@ -15,8 +14,6 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname()
-
-  // Don't show on admin pages
   if (pathname?.startsWith('/admin')) return null
 
   return (
@@ -25,7 +22,7 @@ export default function BottomNav() {
         <nav className="glass-nav rounded-2xl px-2 py-2">
           <div className="flex items-center justify-around">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== '/' && pathname?.startsWith(item.href))
               const Icon = item.icon
 
@@ -33,12 +30,11 @@ export default function BottomNav() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={cn(
-                    'flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all',
-                    isActive
-                      ? 'text-indigo-400 bg-indigo-500/15'
-                      : 'text-gray-500 hover:text-gray-300'
-                  )}
+                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all"
+                  style={{
+                    color: isActive ? 'var(--accent)' : 'var(--text-faint)',
+                    background: isActive ? 'var(--accent-muted)' : 'transparent',
+                  }}
                 >
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   <span className="text-[10px] font-medium">{item.label}</span>

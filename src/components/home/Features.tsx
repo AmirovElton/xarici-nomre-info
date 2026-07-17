@@ -1,12 +1,12 @@
 import { Database, Globe, BookOpen, MessageCircle, Shield, Star } from 'lucide-react'
 
 const features = [
-  { icon: Database, title: 'Aktual stok məlumatları', description: 'Hər ölkənin stok vəziyyətini real zamanda izləyin', color: 'bg-green-500/10 text-green-400 border-green-500/20' },
-  { icon: Globe, title: 'Platformaya uyğun ölkə seçimi', description: 'WhatsApp, Telegram və digər platformalar üçün ayrıca stok', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-  { icon: BookOpen, title: 'Addım-addım istifadə təlimatı', description: 'Hesabınızı qorumaq üçün detallı bələdçi', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
-  { icon: Shield, title: 'Sifarişdən əvvəl tam məlumat', description: 'Nömrə haqqında hər şeyi əvvəlcədən bilin', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
-  { icon: Star, title: 'Premium və stabil seçimlər', description: 'Uzunmüddətli istifadə üçün keyfiyyətli nömrələr', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-  { icon: MessageCircle, title: 'Birbaşa WhatsApp dəstəyi', description: 'Suallarınız üçün birbaşa əlaqə saxlayın', color: 'bg-green-500/10 text-green-400 border-green-500/20' },
+  { icon: Database, title: 'Aktual stok məlumatları', desc: 'Hər ölkənin stok vəziyyətini real zamanda izləyin', accent: 'var(--success)' },
+  { icon: Globe, title: 'Platformaya uyğun seçim', desc: 'WhatsApp, Telegram və digər platformalar üçün ayrıca stok', accent: 'var(--info)' },
+  { icon: BookOpen, title: 'Addım-addım təlimat', desc: 'Hesabınızı qorumaq üçün detallı bələdçi', accent: 'var(--accent)' },
+  { icon: Shield, title: 'Sifarişdən əvvəl məlumat', desc: 'Nömrə haqqında hər şeyi əvvəlcədən bilin', accent: 'var(--info)' },
+  { icon: Star, title: 'Premium seçimlər', desc: 'Uzunmüddətli istifadə üçün keyfiyyətli nömrələr', accent: 'var(--warning)' },
+  { icon: MessageCircle, title: 'Birbaşa WhatsApp dəstəyi', desc: 'Suallarınız üçün birbaşa əlaqə saxlayın', accent: 'var(--success)' },
 ]
 
 export default function Features() {
@@ -18,15 +18,15 @@ export default function Features() {
           <p className="section-subtitle">Sifarişdən əvvəl bütün məlumatları bir yerdə əldə edin</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((feature, index) => {
-            const Icon = feature.icon
+          {features.map((f, i) => {
+            const Icon = f.icon
             return (
-              <div key={index} className="glass-card p-5 hover:shadow-glass-lg transition-all duration-300 hover:-translate-y-1">
-                <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center mb-3 ${feature.color}`}>
+              <div key={i} className="theme-card p-5">
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center mb-3" style={{ background: `color-mix(in srgb, ${f.accent} 12%, transparent)`, color: f.accent }}>
                   <Icon size={20} />
                 </div>
-                <h3 className="font-semibold text-gray-200 mb-1">{feature.title}</h3>
-                <p className="text-sm text-gray-500">{feature.description}</p>
+                <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{f.title}</h3>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{f.desc}</p>
               </div>
             )
           })}

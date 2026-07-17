@@ -1,6 +1,7 @@
 import Hero from '@/components/home/Hero'
 import Features from '@/components/home/Features'
 import Warning from '@/components/home/Warning'
+import HomeCountries from '@/components/home/HomeCountries'
 import HomeReviews from '@/components/home/HomeReviews'
 import CTASection from '@/components/home/CTASection'
 
@@ -9,6 +10,7 @@ export default function HomePage() {
     <div className="animate-fade-in">
       <Hero />
       <Features />
+      <HomeCountries />
       <Warning />
       <HomeReviews />
       <CTASection />
