@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
-import { getWhatsAppUrl } from '@/lib/utils'
 
 const navItems = [
   { label: 'Ana səhifə', href: '/' },
@@ -23,44 +22,80 @@ export default function Header() {
         <div className="mx-4 mt-3">
           <nav className="glass-nav rounded-2xl px-4 py-3 md:px-6">
             <div className="flex items-center justify-between">
+              {/* Logo */}
               <Link href="/" className="flex items-center gap-2.5">
                 <Image src="/logo.svg" alt="XariciNomrəAz" width={36} height={36} className="rounded-xl" />
                 <span className="font-bold text-lg">
                   <span className="gradient-text">XariciNomrə</span>
-                  <span className="text-gray-200">Az</span>
+                  <span style={{ color: 'var(--text-primary)' }}>Az</span>
                 </span>
               </Link>
 
+              {/* Desktop Nav */}
               <div className="hidden md:flex items-center gap-1">
                 {navItems.map((item) => (
-                  <Link key={item.href} href={item.href} className="px-4 py-2 rounded-xl text-sm font-medium text-gray-300 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all">
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    style={{ color: 'var(--text-secondary)' }}
+                    className="px-4 py-2 rounded-xl text-sm font-medium hover:opacity-80 transition-all"
+                  >
                     {item.label}
                   </Link>
                 ))}
               </div>
 
+              {/* Desktop WhatsApp Button */}
               <div className="hidden md:flex items-center gap-3">
-                <a href={getWhatsAppUrl('994501234567', 'Salam, XariciNomrəAz saytından gəlirəm.')} target="_blank" rel="noopener noreferrer" className="btn-whatsapp text-sm py-2 px-4">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.29-.174-3.03.795.808-2.953-.192-.303A8 8 0 1112 20z"/></svg>
+                <a
+                  href="https://wa.me/994501234567?text=Salam%2C%20XariciNomr%C9%99Az%20sayt%C4%B1ndan%20g%C9%99lir%C9%99m."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-whatsapp text-sm py-2 px-4"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.29-.174-3.03.795.808-2.953-.192-.303A8 8 0 1112 20z"/>
+                  </svg>
                   Sifariş et
                 </a>
               </div>
 
-              <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 rounded-xl hover:bg-zinc-800/50 transition-colors text-gray-300">
+              {/* Mobile Menu Toggle */}
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden p-2 rounded-xl transition-colors"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
 
+            {/* Mobile Menu Dropdown */}
             {isOpen && (
-              <div className="md:hidden mt-3 pt-3 border-t border-zinc-700/50 animate-fade-in">
+              <div className="md:hidden mt-3 pt-3 border-t animate-fade-in" style={{ borderColor: 'var(--border-subtle)' }}>
                 <div className="flex flex-col gap-1">
                   {navItems.map((item) => (
-                    <Link key={item.href} href={item.href} onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-xl text-sm font-medium text-gray-300 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all">
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      style={{ color: 'var(--text-secondary)' }}
+                      className="px-4 py-3 rounded-xl text-sm font-medium hover:opacity-80 transition-all"
+                    >
                       {item.label}
                     </Link>
                   ))}
-                  <a href={getWhatsAppUrl('994501234567', 'Salam, XariciNomrəAz saytından gəlirəm.')} target="_blank" rel="noopener noreferrer" className="btn-whatsapp text-sm mt-2">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.29-.174-3.03.795.808-2.953-.192-.303A8 8 0 1112 20z"/></svg>
+                  <a
+                    href="https://wa.me/994501234567?text=Salam%2C%20XariciNomr%C9%99Az%20sayt%C4%B1ndan%20g%C9%99lir%C9%99m."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-whatsapp text-sm mt-2"
+                  >
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.29-.174-3.03.795.808-2.953-.192-.303A8 8 0 1112 20z"/>
+                    </svg>
                     WhatsApp-dan sifariş et
                   </a>
                 </div>
@@ -69,7 +104,14 @@ export default function Header() {
           </nav>
         </div>
       </header>
-      {isOpen && <div className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />}
+
+      {/* Mobile Menu Blur Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
     </>
   )
 }

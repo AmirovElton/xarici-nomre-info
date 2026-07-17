@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { BookOpen, Zap, Shield, MessageCircle, Send, HelpCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import WhatIsSection from './WhatIsSection'
 import ProcessSection from './ProcessSection'
 import SafetySection from './SafetySection'
@@ -25,17 +24,37 @@ export default function GuideClient() {
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-4xl mx-auto">
+        {/* Centered title */}
         <div className="text-center mb-6">
           <h1 className="section-title">Bələdçi</h1>
           <p className="section-subtitle">Sifarişdən əvvəl bilməli olduğunuz hər şey</p>
         </div>
 
+        {/* 3x2 Grid of Tab Buttons */}
         <div className="mb-8">
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto sm:grid-cols-3 md:grid-cols-6 md:max-w-none">
             {tabs.map((tab) => {
               const Icon = tab.icon
+              const isActive = activeTab === tab.id
               return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={cn('flex flex-col items-center gap-1.5 px-3 py-3 rounded-2xl text-xs font-medium transition-all', activeTab === tab.id ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg' : 'bg-zinc-900/70 border border-zinc-800/60 text-gray-400 hover:text-gray-200 hover:border-zinc-700')}>
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className="flex flex-col items-center gap-1.5 px-3 py-3 rounded-2xl text-xs font-medium transition-all"
+                  style={
+                    isActive
+                      ? {
+                          background: 'linear-gradient(135deg, var(--accent), #a855f7)',
+                          color: '#ffffff',
+                          boxShadow: '0 0 20px color-mix(in srgb, var(--accent) 40%, transparent)',
+                        }
+                      : {
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-muted)',
+                        }
+                  }
+                >
                   <Icon size={18} />
                   {tab.label}
                 </button>
@@ -44,6 +63,7 @@ export default function GuideClient() {
           </div>
         </div>
 
+        {/* Tab Content */}
         <div className="animate-fade-in">
           {activeTab === 'what-is' && <WhatIsSection />}
           {activeTab === 'process' && <ProcessSection />}

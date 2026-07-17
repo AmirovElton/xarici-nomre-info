@@ -116,10 +116,10 @@ export interface AdminActivity {
 }
 
 export const STOCK_STATUS_MAP: Record<StockStatus, { label: string; color: string }> = {
-  in_stock: { label: 'Stokda var', color: 'text-green-400 bg-green-500/10 border-green-500/20' },
-  low_stock: { label: 'Az qalıb', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
-  out_of_stock: { label: 'Stokda yoxdur', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
-  coming_soon: { label: 'Yaxın zamanda', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
-  temporarily_unavailable: { label: 'Müvəqqəti mövcud deyil', color: 'text-gray-400 bg-gray-500/10 border-gray-500/20' },
-  sales_stopped: { label: 'Satış dayandırılıb', color: 'text-red-500 bg-red-500/10 border-red-500/30' },
+  in_stock: { label: 'Stokda var', color: 'badge-success' },
+  low_stock: { label: 'Az qalıb', color: 'badge-warning' },
+  out_of_stock: { label: 'Stokda yoxdur', color: 'badge-danger' },
+  coming_soon: { label: 'Yaxın zamanda', color: 'badge-info' },
+  temporarily_unavailable: { label: 'Müvəqqəti mövcud deyil', color: 'badge-accent' },
+  sales_stopped: { label: 'Satış dayandırılıb', color: 'badge-danger' },
 }

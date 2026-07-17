@@ -5,9 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Globe, MapPin, Star, MessageSquare,
-  HelpCircle, Settings, LogOut, Menu, X
+  HelpCircle, Image, Settings, LogOut, Menu, X
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const sidebarItems = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -16,6 +15,7 @@ const sidebarItems = [
   { label: 'Premium', href: '/admin/premium', icon: Star },
   { label: 'Rəylər', href: '/admin/reviews', icon: MessageSquare },
   { label: 'FAQ', href: '/admin/faq', icon: HelpCircle },
+  { label: 'Logo', href: '/admin/logo', icon: Image },
   { label: 'Ayarlar', href: '/admin/settings', icon: Settings },
 ]
 
@@ -27,7 +27,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  // Check if logged in (simple session check)
   useEffect(() => {
     const session = localStorage.getItem('admin_session')
     if (session) setIsLoggedIn(true)
@@ -35,7 +34,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    // Will be replaced with Supabase auth
     if (email && password) {
       localStorage.setItem('admin_session', 'true')
       setIsLoggedIn(true)
@@ -50,47 +48,57 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setIsLoggedIn(false)
   }
 
-  // Login Page
+  // Dark Login Page
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 gradient-bg">
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: 'var(--bg-primary)' }}
+      >
         <div className="w-full max-w-sm">
-          <div className="glass-card p-8">
+          <div className="theme-card p-8">
+            {/* XN Gradient Logo */}
             <div className="text-center mb-8">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-4">
+              <div
+                className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4"
+                style={{ background: 'linear-gradient(135deg, var(--accent), #a855f7)' }}
+              >
                 <span className="text-white font-bold text-xl">XN</span>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-              <p className="text-sm text-gray-500 mt-1">XariciNomrəAz idarəetmə</p>
+              <h1 style={{ color: 'var(--text-primary)' }} className="text-xl font-bold">Admin Panel</h1>
+              <p style={{ color: 'var(--text-faint)' }} className="text-sm mt-1">XariciNomrəAz idarəetmə</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
               {error && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">
+                <div
+                  className="p-3 rounded-xl text-sm"
+                  style={{ background: 'color-mix(in srgb, var(--danger) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--danger) 20%, transparent)', color: 'var(--danger)' }}
+                >
                   {error}
                 </div>
               )}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">E-poçt</label>
+                <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">E-poçt</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="theme-input w-full px-4 py-3 rounded-xl text-sm"
                   placeholder="admin@xaricinomsreaz.com"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Parol</label>
+                <label style={{ color: 'var(--text-muted)' }} className="text-sm font-medium mb-1 block">Parol</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="theme-input w-full px-4 py-3 rounded-xl text-sm"
                   placeholder="••••••••"
                 />
               </div>
-              <button type="submit" className="w-full btn-primary">
+              <button type="submit" className="btn-primary w-full">
                 Daxil ol
               </button>
             </form>
@@ -100,46 +108,54 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  // Admin Layout
+  // Admin Layout with Sidebar
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100">
+      <div
+        className="md:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between backdrop-blur-xl"
+        style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)' }}
+      >
+        <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }}>
           <Menu size={20} />
         </button>
-        <span className="font-bold text-sm">Admin Panel</span>
-        <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-gray-100 text-red-500">
+        <span style={{ color: 'var(--text-primary)' }} className="font-bold text-sm">Admin Panel</span>
+        <button onClick={handleLogout} className="p-2 rounded-lg" style={{ color: 'var(--danger)' }}>
           <LogOut size={18} />
         </button>
       </div>
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)} />
+        <div className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
-      <aside className={cn(
-        'fixed top-0 left-0 bottom-0 w-64 bg-white border-r border-gray-200 z-50 transition-transform md:translate-x-0',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      )}>
+      {/* Sidebar with glass effect */}
+      <aside
+        className={`fixed top-0 left-0 bottom-0 w-64 z-50 transition-transform md:translate-x-0 backdrop-blur-xl ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border-subtle)' }}
+      >
         <div className="p-6">
+          {/* Sidebar Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, var(--accent), #a855f7)' }}
+              >
                 <span className="text-white font-bold text-sm">XN</span>
               </div>
               <div>
-                <p className="font-bold text-sm">XariciNomrəAz</p>
-                <p className="text-xs text-gray-500">Admin</p>
+                <p style={{ color: 'var(--text-primary)' }} className="font-bold text-sm">XariciNomrəAz</p>
+                <p style={{ color: 'var(--text-faint)' }} className="text-xs">Admin</p>
               </div>
             </div>
-            <button onClick={() => setSidebarOpen(false)} className="md:hidden p-1 rounded-lg hover:bg-gray-100">
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden p-1 rounded-lg" style={{ color: 'var(--text-muted)' }}>
               <X size={18} />
             </button>
           </div>
 
+          {/* Navigation */}
           <nav className="space-y-1">
             {sidebarItems.map((item) => {
               const Icon = item.icon
@@ -149,12 +165,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   key={item.href}
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={
                     isActive
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  )}
+                      ? {
+                          background: 'var(--accent-muted)',
+                          color: 'var(--accent-hover)',
+                          boxShadow: '0 0 12px color-mix(in srgb, var(--accent) 20%, transparent)',
+                        }
+                      : {
+                          color: 'var(--text-muted)',
+                        }
+                  }
                 >
                   <Icon size={18} />
                   {item.label}
@@ -164,10 +186,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200">
+        {/* Logout button at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all w-full"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full"
+            style={{ color: 'var(--danger)' }}
           >
             <LogOut size={18} />
             Çıxış

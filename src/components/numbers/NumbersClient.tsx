@@ -3,12 +3,12 @@
 import { useState, useMemo } from 'react'
 import { Search, ArrowLeft, RefreshCw } from 'lucide-react'
 import CountryCard from './CountryCard'
-import { cn } from '@/lib/utils'
+import { WhatsAppIcon, TelegramIcon, GlobalIcon } from './PlatformIcons'
 
 const platforms = [
-  { id: '2', name: 'WhatsApp', icon: '💬', desc: 'WhatsApp nömrələri' },
-  { id: '3', name: 'Telegram', icon: '✈️', desc: 'Telegram nömrələri' },
-  { id: '4', name: 'Digər', icon: '🌐', desc: 'Digər platformalar' },
+  { id: '2', name: 'WhatsApp', icon: 'whatsapp', desc: 'WhatsApp nömrələri' },
+  { id: '3', name: 'Telegram', icon: 'telegram', desc: 'Telegram nömrələri' },
+  { id: '4', name: 'Digər', icon: 'global', desc: 'Digər platformalar' },
 ]
 
 const countries = [
@@ -29,6 +29,12 @@ const stockFilters = [
   { id: 'popular', label: 'Ən çox seçilən' },
 ]
 
+function PlatformIcon({ type, size = 40 }: { type: string; size?: number }) {
+  if (type === 'whatsapp') return <WhatsAppIcon size={size} />
+  if (type === 'telegram') return <TelegramIcon size={size} />
+  return <GlobalIcon size={size} />
+}
+
 export default function NumbersClient() {
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -47,6 +53,7 @@ export default function NumbersClient() {
     return result
   }, [selectedPlatform, searchQuery, stockFilter])
 
+  // Platform Selection Screen
   if (!selectedPlatform) {
     return (
       <div className="px-4 py-6 animate-fade-in">
@@ -55,59 +62,106 @@ export default function NumbersClient() {
             <h1 className="section-title">Nömrələr</h1>
             <p className="section-subtitle">Platformanızı seçin</p>
           </div>
+
+          {/* 2-col grid for first two, 1-col for "Digər" */}
           <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-4">
             {platforms.slice(0, 2).map((p) => (
-              <button key={p.id} onClick={() => setSelectedPlatform(p.id)} className="glass-card p-6 flex flex-col items-center gap-3 hover:border-indigo-500/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <span className="text-4xl">{p.icon}</span>
-                <span className="font-semibold text-gray-100">{p.name}</span>
-                <span className="text-xs text-gray-500">{p.desc}</span>
+              <button
+                key={p.id}
+                onClick={() => setSelectedPlatform(p.id)}
+                className="theme-card p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300"
+              >
+                <PlatformIcon type={p.icon} size={40} />
+                <span style={{ color: 'var(--text-primary)' }} className="font-semibold">{p.name}</span>
+                <span style={{ color: 'var(--text-faint)' }} className="text-xs">{p.desc}</span>
               </button>
             ))}
           </div>
           <div className="max-w-[200px] mx-auto">
             {platforms.slice(2).map((p) => (
-              <button key={p.id} onClick={() => setSelectedPlatform(p.id)} className="glass-card p-6 w-full flex flex-col items-center gap-3 hover:border-indigo-500/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <span className="text-4xl">{p.icon}</span>
-                <span className="font-semibold text-gray-100">{p.name}</span>
-                <span className="text-xs text-gray-500">{p.desc}</span>
+              <button
+                key={p.id}
+                onClick={() => setSelectedPlatform(p.id)}
+                className="theme-card p-6 w-full flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300"
+              >
+                <PlatformIcon type={p.icon} size={40} />
+                <span style={{ color: 'var(--text-primary)' }} className="font-semibold">{p.name}</span>
+                <span style={{ color: 'var(--text-faint)' }} className="text-xs">{p.desc}</span>
               </button>
             ))}
           </div>
-          <div className="mt-8 text-center flex items-center justify-center gap-2 text-xs text-gray-500">
-            <RefreshCw size={12} /><span>Stok məlumatları son dəfə 15 iyul 2026 tarixində yenilənib</span>
+
+          <div className="mt-8 text-center flex items-center justify-center gap-2 text-xs" style={{ color: 'var(--text-faint)' }}>
+            <RefreshCw size={12} />
+            <span>Stok məlumatları son dəfə 15 iyul 2026 tarixində yenilənib</span>
           </div>
         </div>
       </div>
     )
   }
 
+  // Countries List Screen
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-6xl mx-auto">
+        {/* Header with back button */}
         <div className="text-center mb-6">
-          <button onClick={() => { setSelectedPlatform(null); setSearchQuery(''); setStockFilter('all') }} className="inline-flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 mb-3"><ArrowLeft size={16} /> Platformalar</button>
+          <button
+            onClick={() => { setSelectedPlatform(null); setSearchQuery(''); setStockFilter('all') }}
+            className="inline-flex items-center gap-2 text-sm mb-3 transition-opacity hover:opacity-80"
+            style={{ color: 'var(--accent)' }}
+          >
+            <ArrowLeft size={16} /> Platformalar
+          </button>
           <h1 className="section-title">{platforms.find(p => p.id === selectedPlatform)?.name} Nömrələri</h1>
           <p className="section-subtitle">Mövcud ölkələri və stok vəziyyətini görün</p>
         </div>
+
+        {/* Search Input */}
         <div className="relative max-w-lg mx-auto mb-5">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Ölkə adı və ya kodu axtar..." className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-900/80 border border-zinc-700/50 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all" />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-faint)' }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Ölkə adı və ya kodu axtar..."
+            className="theme-input w-full pl-11 pr-4 py-3.5 rounded-2xl text-sm"
+          />
         </div>
+
+        {/* Filters */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
           {stockFilters.map((f) => (
-            <button key={f.id} onClick={() => setStockFilter(f.id)} className={cn('px-4 py-2 rounded-xl text-xs font-medium transition-all border', stockFilter === f.id ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-zinc-900/50 text-gray-400 border-zinc-700/50 hover:bg-zinc-800/50')}>{f.label}</button>
+            <button
+              key={f.id}
+              onClick={() => setStockFilter(f.id)}
+              className="px-4 py-2 rounded-xl text-xs font-medium transition-all border"
+              style={
+                stockFilter === f.id
+                  ? { background: 'color-mix(in srgb, var(--accent) 15%, transparent)', color: 'var(--accent)', borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }
+                  : { background: 'var(--bg-card)', color: 'var(--text-muted)', borderColor: 'var(--border-subtle)' }
+              }
+            >
+              {f.label}
+            </button>
           ))}
         </div>
-        <p className="text-sm text-gray-500 mb-4 text-center">{filteredCountries.length} nəticə</p>
+
+        {/* Results count */}
+        <p className="text-sm mb-4 text-center" style={{ color: 'var(--text-faint)' }}>
+          {filteredCountries.length} nəticə
+        </p>
+
+        {/* Country Cards */}
         {filteredCountries.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredCountries.map((c) => <CountryCard key={c.id} country={c} />)}
           </div>
         ) : (
-          <div className="glass-card p-12 text-center">
-            <Search size={24} className="mx-auto text-gray-600 mb-3" />
-            <h3 className="font-semibold text-gray-300 mb-2">Nəticə tapılmadı</h3>
-            <p className="text-sm text-gray-500">Axtarış parametrlərini dəyişdirin</p>
+          <div className="theme-card p-12 text-center">
+            <Search size={24} className="mx-auto mb-3" style={{ color: 'var(--text-faint)' }} />
+            <h3 style={{ color: 'var(--text-secondary)' }} className="font-semibold mb-2">Nəticə tapılmadı</h3>
+            <p style={{ color: 'var(--text-faint)' }} className="text-sm">Axtarış parametrlərini dəyişdirin</p>
           </div>
         )}
       </div>
