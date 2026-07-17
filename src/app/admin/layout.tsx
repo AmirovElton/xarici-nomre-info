@@ -49,7 +49,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (authError) {
-      setError('E-poçt və ya parol yanlışdır.')
+      const msg = authError.message.toLowerCase()
+      if (msg.includes('not confirmed') || msg.includes('confirm')) {
+        setError('E-poçt təsdiqlənməyib. Supabase-də istifadəçini "Auto Confirm" edin.')
+      } else if (msg.includes('invalid')) {
+        setError('E-poçt və ya parol yanlışdır.')
+      } else {
+        setError('Giriş xətası: ' + authError.message)
+      }
     }
   }
 
