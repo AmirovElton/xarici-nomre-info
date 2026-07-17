@@ -25,6 +25,7 @@ DROP FUNCTION IF EXISTS update_country_last_updated() CASCADE;
 CREATE TABLE site_settings (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   site_name TEXT NOT NULL DEFAULT 'XariciNomrəAz',
+  logo_url TEXT,
   slogan TEXT DEFAULT 'Xarici nömrələr haqqında doğru məlumat, düzgün seçim və təhlükəsiz istifadə.',
   hero_title TEXT DEFAULT 'Xarici virtual nömrələr haqqında bilməli olduğunuz hər şey',
   hero_subtitle TEXT DEFAULT 'Platformanıza uyğun ölkələri, aktual stok vəziyyətini, istifadə qaydalarını və təhlükəsizlik tövsiyələrini sifarişdən əvvəl öyrənin.',
