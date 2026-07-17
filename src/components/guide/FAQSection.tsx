@@ -1,26 +1,30 @@
 'use client'
 
-import { useState } from 'react'
-import { ChevronDown, HelpCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ChevronDown, HelpCircle, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { fetchActiveFaqs } from '@/lib/public-data'
 
-const faqs = [
-  { q: 'Xarici virtual nömrə nədir?', a: 'Xarici virtual nömrə fiziki SIM kartın istifadəçinin cihazında olmadığı, lakin müəyyən platformalarda qeydiyyat və ya hesab istifadəsi üçün təqdim edilən xarici ölkə nömrəsidir.' },
-  { q: 'Nömrəni neçə dəqiqəyə əldə edirəm?', a: 'Ödəniş təsdiqləndikdən sonra nömrə adətən 5-15 dəqiqə ərzində təqdim edilir. Bəzi hallarda bu müddət bir qədər dəyişə bilər.' },
-  { q: 'Nömrə hansı platformalarda işləyir?', a: 'Hər nömrə konkret platforma üçün təqdim edilir. WhatsApp, Telegram və digər platformalar üçün ayrıca nömrələr mövcuddur.' },
-  { q: 'Kod gəlməsə nə baş verir?', a: 'Əgər SMS kodu müəyyən müddət ərzində gəlməzsə, XariciNomrəAz ilə əlaqə saxlayın. Şərtlərə uyğun olaraq alternativ həll təklif ediləcək.' },
-  { q: 'Nömrə daimidirmi?', a: 'Bu, nömrənin növünə görə dəyişir. Birdəfəlik nömrələr yalnız kod almaq üçündür, uzunmüddətli nömrələr isə daha uzun müddət istifadə edilə bilər.' },
-  { q: 'Hesab bloklana bilərmi?', a: 'Hər bir platforma öz qaydalarına malikdir. Spam, kütləvi mesaj və qayda pozuntusu blok riskini artırır. Təlimatlarımıza əməl etdikdə risk minimuma endirilir.' },
-  { q: 'Hansı ölkə daha stabildir?', a: 'Premium kateqoriyasındakı ölkələr (Böyük Britaniya, ABŞ və s.) daha stabil hesab olunur. Amma heç bir nömrə üçün 100% zəmanət verilmir.' },
-  { q: 'İki addımlı doğrulama nə vaxt aktiv edilməlidir?', a: 'Hesabı aldıqdan dərhal sonra iki addımlı doğrulamanı aktiv etməniz tövsiyə olunur.' },
-  { q: 'VPN istifadə etmək olar?', a: 'Bəzi platformalar VPN istifadəsini şübhəli hesab edə bilər. Mümkün olduqda sabit internet bağlantısından istifadə edin.' },
-  { q: 'Ödəniş necə edilir?', a: 'Ödəniş WhatsApp vasitəsilə razılaşdırılır. Satıcı ödəniş məlumatlarını əlaqə zamanı təqdim edir.' },
-  { q: 'Geri qaytarma şərtləri necədir?', a: 'Geri qaytarma şərtləri məhsulun növünə görə dəyişir. Ətraflı məlumat üçün WhatsApp vasitəsilə əlaqə saxlayın.' },
-  { q: 'Stoklar nə qədər tez yenilənir?', a: 'Stok məlumatları mütəmadi olaraq yenilənir. Son yenilənmə tarixi hər ölkə kartında göstərilir.' },
+// Fallback FAQs shown only if the database has none yet.
+const fallbackFaqs = [
+  { question: 'Xarici virtual nömrə nədir?', answer: 'Xarici virtual nömrə fiziki SIM kartın istifadəçinin cihazında olmadığı, lakin müəyyən platformalarda qeydiyyat və ya hesab istifadəsi üçün təqdim edilən xarici ölkə nömrəsidir.' },
+  { question: 'Nömrəni neçə dəqiqəyə əldə edirəm?', answer: 'Ödəniş təsdiqləndikdən sonra nömrə adətən 5-15 dəqiqə ərzində təqdim edilir.' },
+  { question: 'Hesab bloklana bilərmi?', answer: 'Hər bir platforma öz qaydalarına malikdir. Spam, kütləvi mesaj və qayda pozuntusu blok riskini artırır. Təlimatlarımıza əməl etdikdə risk minimuma endirilir.' },
 ]
 
+interface FaqItem { question: string; answer: string }
+
 export default function FAQSection() {
+  const [faqs, setFaqs] = useState<FaqItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetchActiveFaqs().then((data) => {
+      setFaqs(data.length > 0 ? data.map(f => ({ question: f.question, answer: f.answer })) : fallbackFaqs)
+      setLoading(false)
+    })
+  }, [])
 
   return (
     <div className="space-y-3">
@@ -36,29 +40,35 @@ export default function FAQSection() {
         </div>
       </div>
 
-      {faqs.map((faq, index) => {
-        const isOpen = openIndex === index
-        return (
-          <div key={index} className="theme-card overflow-hidden">
-            <button
-              onClick={() => setOpenIndex(isOpen ? null : index)}
-              className="w-full flex items-center gap-3 p-4 text-left"
-            >
-              <span style={{ color: 'var(--text-primary)' }} className="flex-1 font-semibold text-sm">{faq.q}</span>
-              <ChevronDown
-                size={18}
-                style={{ color: 'var(--text-muted)' }}
-                className={cn('transition-transform flex-shrink-0', isOpen && 'rotate-180')}
-              />
-            </button>
-            {isOpen && (
-              <div className="px-4 pb-4 pt-0 animate-fade-in">
-                <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed">{faq.a}</p>
-              </div>
-            )}
-          </div>
-        )
-      })}
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent)' }} />
+        </div>
+      ) : (
+        faqs.map((faq, index) => {
+          const isOpen = openIndex === index
+          return (
+            <div key={index} className="theme-card overflow-hidden">
+              <button
+                onClick={() => setOpenIndex(isOpen ? null : index)}
+                className="w-full flex items-center gap-3 p-4 text-left"
+              >
+                <span style={{ color: 'var(--text-primary)' }} className="flex-1 font-semibold text-sm">{faq.question}</span>
+                <ChevronDown
+                  size={18}
+                  style={{ color: 'var(--text-muted)' }}
+                  className={cn('transition-transform flex-shrink-0', isOpen && 'rotate-180')}
+                />
+              </button>
+              {isOpen && (
+                <div className="px-4 pb-4 pt-0 animate-fade-in">
+                  <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed">{faq.answer}</p>
+                </div>
+              )}
+            </div>
+          )
+        })
+      )}
     </div>
   )
 }

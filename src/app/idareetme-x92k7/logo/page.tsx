@@ -18,25 +18,37 @@ export default function AdminLogoPage() {
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 2500) }
 
   useEffect(() => {
-    adminDb<SettingsRow>({ action: 'select', table: 'site_settings', single: true }).then(({ data }) => {
-      if (data) {
-        setRowId(data.id)
-        setSiteName(data.site_name || '')
-        setLogoUrl(data.logo_url || '')
+    (async () => {
+      const { data } = await adminDb<SettingsRow[]>({ action: 'select', table: 'site_settings' })
+      if (data && data.length > 0) {
+        setRowId(data[0].id)
+        setSiteName(data[0].site_name || '')
+        setLogoUrl(data[0].logo_url || '')
+      } else {
+        const created = await adminDb<SettingsRow[]>({
+          action: 'insert', table: 'site_settings',
+          values: { site_name: 'XariciNomrəAz' },
+        })
+        if (created.data && created.data.length > 0) {
+          setRowId(created.data[0].id)
+          setSiteName(created.data[0].site_name || '')
+        }
       }
       setLoading(false)
-    })
+    })()
   }, [])
 
   const save = async () => {
-    if (!rowId) { showToast('Ayarlar tapılmadı'); return }
     setSaving(true)
-    const { error } = await adminDb({
-      action: 'update', table: 'site_settings', match: { id: rowId },
-      values: { site_name: siteName, logo_url: logoUrl || null },
-    })
+    const values = { site_name: siteName, logo_url: logoUrl || null }
+    const res = rowId
+      ? await adminDb({ action: 'update', table: 'site_settings', match: { id: rowId }, values })
+      : await adminDb<SettingsRow[]>({ action: 'insert', table: 'site_settings', values })
+    if (!rowId && res.data && (res.data as SettingsRow[]).length > 0) {
+      setRowId((res.data as SettingsRow[])[0].id)
+    }
     setSaving(false)
-    showToast(error ? 'Xəta: ' + error.message : 'Yadda saxlanıldı ✓')
+    showToast(res.error ? 'Xəta: ' + res.error.message : 'Yadda saxlanıldı ✓')
   }
 
   if (loading) return <AdminLoading />

@@ -19,43 +19,58 @@ export default function AdminSettingsPage() {
 
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 2500) }
 
+  const applyRow = (data: SiteSettings) => {
+    setRowId(data.id)
+    setS({
+      site_name: data.site_name || '',
+      slogan: data.slogan || '',
+      hero_title: data.hero_title || '',
+      hero_subtitle: data.hero_subtitle || '',
+      whatsapp_number: data.whatsapp_number || '',
+      instagram_url: data.instagram_url || '',
+      telegram_url: data.telegram_url || '',
+      email: data.email || '',
+      working_hours: data.working_hours || '',
+      footer_text: data.footer_text || '',
+      default_whatsapp_message: data.default_whatsapp_message || '',
+      warning_text: data.warning_text || '',
+    })
+  }
+
   useEffect(() => {
-    adminDb<SiteSettings>({ action: 'select', table: 'site_settings', single: true }).then(({ data }) => {
-      if (data) {
-        setRowId(data.id)
-        setS({
-          site_name: data.site_name || '',
-          slogan: data.slogan || '',
-          hero_title: data.hero_title || '',
-          hero_subtitle: data.hero_subtitle || '',
-          whatsapp_number: data.whatsapp_number || '',
-          instagram_url: data.instagram_url || '',
-          telegram_url: data.telegram_url || '',
-          email: data.email || '',
-          working_hours: data.working_hours || '',
-          footer_text: data.footer_text || '',
-          default_whatsapp_message: data.default_whatsapp_message || '',
-          warning_text: data.warning_text || '',
+    (async () => {
+      const { data } = await adminDb<SiteSettings[]>({ action: 'select', table: 'site_settings' })
+      if (data && data.length > 0) {
+        applyRow(data[0])
+      } else {
+        // No settings row yet — create one automatically
+        const created = await adminDb<SiteSettings[]>({
+          action: 'insert', table: 'site_settings',
+          values: { site_name: 'XariciNomrəAz' },
         })
+        if (created.data && created.data.length > 0) applyRow(created.data[0])
       }
       setLoading(false)
-    })
+    })()
   }, [])
 
   const save = async () => {
-    if (!rowId) { showToast('Ayarlar tapılmadı'); return }
     setSaving(true)
-    const { error } = await adminDb({
-      action: 'update', table: 'site_settings', match: { id: rowId },
-      values: {
-        site_name: s.site_name, slogan: s.slogan, hero_title: s.hero_title, hero_subtitle: s.hero_subtitle,
-        whatsapp_number: s.whatsapp_number, instagram_url: s.instagram_url || null, telegram_url: s.telegram_url || null,
-        email: s.email || null, working_hours: s.working_hours, footer_text: s.footer_text,
-        default_whatsapp_message: s.default_whatsapp_message, warning_text: s.warning_text,
-      },
-    })
+    const values = {
+      site_name: s.site_name, slogan: s.slogan, hero_title: s.hero_title, hero_subtitle: s.hero_subtitle,
+      whatsapp_number: s.whatsapp_number, instagram_url: s.instagram_url || null, telegram_url: s.telegram_url || null,
+      email: s.email || null, working_hours: s.working_hours, footer_text: s.footer_text,
+      default_whatsapp_message: s.default_whatsapp_message, warning_text: s.warning_text,
+    }
+    // Update if we have a row, otherwise create it
+    const res = rowId
+      ? await adminDb({ action: 'update', table: 'site_settings', match: { id: rowId }, values })
+      : await adminDb<SiteSettings[]>({ action: 'insert', table: 'site_settings', values })
+    if (!rowId && res.data && (res.data as SiteSettings[]).length > 0) {
+      setRowId((res.data as SiteSettings[])[0].id)
+    }
     setSaving(false)
-    showToast(error ? 'Xəta: ' + error.message : 'Ayarlar yadda saxlanıldı ✓')
+    showToast(res.error ? 'Xəta: ' + res.error.message : 'Ayarlar yadda saxlanıldı ✓')
   }
 
   const set = (k: string, v: string) => setS(prev => ({ ...prev, [k]: v }))
