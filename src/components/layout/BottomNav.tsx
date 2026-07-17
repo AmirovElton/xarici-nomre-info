@@ -16,8 +16,8 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname()
 
-  // Don't show on admin pages
-  if (pathname?.startsWith('/admin')) return null
+  // Don't show on admin/panel pages
+  if (pathname?.startsWith('/idareetme')) return null
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
@@ -25,7 +25,7 @@ export default function BottomNav() {
         <nav className="glass-nav rounded-2xl px-2 py-2">
           <div className="flex items-center justify-around">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== '/' && pathname?.startsWith(item.href))
               const Icon = item.icon
 

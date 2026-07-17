@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Star, Home } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminDb } from '@/lib/admin-api'
 import type { Country, Platform } from '@/lib/types'
 import { AdminHeader, AdminLoading, AdminEmpty, Toast, Toggle } from '@/components/admin/ui'
 
@@ -16,12 +16,12 @@ export default function AdminPremiumPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const [{ data: c }, { data: p }] = await Promise.all([
-      supabase.from('countries').select('*').order('sort_order', { ascending: true }),
-      supabase.from('platforms').select('*'),
+    const [c, p] = await Promise.all([
+      adminDb<Country[]>({ action: 'select', table: 'countries', order: { column: 'sort_order', ascending: true } }),
+      adminDb<Platform[]>({ action: 'select', table: 'platforms' }),
     ])
-    setCountries((c as Country[]) || [])
-    setPlatforms((p as Platform[]) || [])
+    setCountries(c.data || [])
+    setPlatforms(p.data || [])
     setLoading(false)
   }, [])
 
@@ -32,14 +32,14 @@ export default function AdminPremiumPage() {
   const togglePremium = async (c: Country) => {
     const next = !c.is_premium
     setCountries(prev => prev.map(x => x.id === c.id ? { ...x, is_premium: next } : x))
-    await supabase.from('countries').update({ is_premium: next }).eq('id', c.id)
+    await adminDb({ action: 'update', table: 'countries', values: { is_premium: next }, match: { id: c.id } })
     showToast(next ? 'Premium edildi' : 'Premium ləğv edildi')
   }
 
   const togglePopular = async (c: Country) => {
     const next = !c.is_popular
     setCountries(prev => prev.map(x => x.id === c.id ? { ...x, is_popular: next } : x))
-    await supabase.from('countries').update({ is_popular: next }).eq('id', c.id)
+    await adminDb({ action: 'update', table: 'countries', values: { is_popular: next }, match: { id: c.id } })
     showToast(next ? 'Ən çox seçilən edildi' : 'Ləğv edildi')
   }
 
@@ -52,7 +52,7 @@ export default function AdminPremiumPage() {
       <div className="theme-card p-4 mb-6" style={{ border: '1px solid color-mix(in srgb, var(--warning) 25%, transparent)' }}>
         <p style={{ color: 'var(--text-secondary)' }} className="text-sm flex items-start gap-2">
           <Star size={16} style={{ color: 'var(--warning)' }} className="flex-shrink-0 mt-0.5" />
-          Hər ölkəni premium və ya "ən çox seçilən" kimi işarələyin. Premium ölkələr Premium səhifəsində göstərilir.
+          Hər ölkəni premium və ya &quot;ən çox seçilən&quot; kimi işarələyin. Premium ölkələr Premium səhifəsində göstərilir.
         </p>
       </div>
 

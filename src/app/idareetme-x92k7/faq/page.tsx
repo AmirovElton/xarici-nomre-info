@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit2, Trash2, Save } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminDb } from '@/lib/admin-api'
 import type { FAQ } from '@/lib/types'
 import { AdminHeader, AdminButton, Field, TextInput, TextArea, Toggle, Modal, AdminLoading, AdminEmpty, Toast } from '@/components/admin/ui'
 
@@ -21,8 +21,8 @@ export default function AdminFaqPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase.from('faqs').select('*').order('sort_order', { ascending: true })
-    setFaqs((data as FAQ[]) || [])
+    const { data } = await adminDb<FAQ[]>({ action: 'select', table: 'faqs', order: { column: 'sort_order', ascending: true } })
+    setFaqs(data || [])
     setLoading(false)
   }, [])
 
@@ -43,20 +43,17 @@ export default function AdminFaqPage() {
   const save = async () => {
     if (!form.question || !form.answer) { showToast('Sual və cavab mütləqdir'); return }
     setSaving(true)
-    const payload = {
+    const values = {
       question: form.question.trim(),
       answer: form.answer.trim(),
       sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
     }
-    let err
-    if (editId) {
-      ({ error: err } = await supabase.from('faqs').update(payload).eq('id', editId))
-    } else {
-      ({ error: err } = await supabase.from('faqs').insert(payload))
-    }
+    const res = editId
+      ? await adminDb({ action: 'update', table: 'faqs', values, match: { id: editId } })
+      : await adminDb({ action: 'insert', table: 'faqs', values })
     setSaving(false)
-    if (err) { showToast('Xəta: ' + err.message); return }
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     setModalOpen(false)
     showToast(editId ? 'Sual yeniləndi' : 'Sual əlavə edildi')
     load()
@@ -64,15 +61,15 @@ export default function AdminFaqPage() {
 
   const remove = async (id: string) => {
     if (!confirm('Bu sualı silmək istədiyinizə əminsiniz?')) return
-    const { error } = await supabase.from('faqs').delete().eq('id', id)
-    if (error) { showToast('Xəta: ' + error.message); return }
+    const res = await adminDb({ action: 'delete', table: 'faqs', match: { id } })
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     showToast('Sual silindi')
     load()
   }
 
   const toggleActive = async (f: FAQ) => {
     setFaqs(prev => prev.map(x => x.id === f.id ? { ...x, is_active: !x.is_active } : x))
-    await supabase.from('faqs').update({ is_active: !f.is_active }).eq('id', f.id)
+    await adminDb({ action: 'update', table: 'faqs', values: { is_active: !f.is_active }, match: { id: f.id } })
   }
 
   return (

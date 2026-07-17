@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit2, Trash2, Save } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminDb } from '@/lib/admin-api'
 import type { Platform } from '@/lib/types'
 import { AdminHeader, AdminButton, Field, TextInput, TextArea, Toggle, Modal, AdminLoading, AdminEmpty, Toast } from '@/components/admin/ui'
 
@@ -21,8 +21,8 @@ export default function AdminPlatformsPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase.from('platforms').select('*').order('sort_order', { ascending: true })
-    setPlatforms((data as Platform[]) || [])
+    const { data } = await adminDb<Platform[]>({ action: 'select', table: 'platforms', order: { column: 'sort_order', ascending: true } })
+    setPlatforms(data || [])
     setLoading(false)
   }, [])
 
@@ -43,20 +43,17 @@ export default function AdminPlatformsPage() {
   const save = async () => {
     if (!form.name) { showToast('Platforma adı mütləqdir'); return }
     setSaving(true)
-    const payload = {
+    const values = {
       name: form.name.trim(),
       description: form.description || null,
       sort_order: Number(form.sort_order) || 0,
       is_active: form.is_active,
     }
-    let err
-    if (editId) {
-      ({ error: err } = await supabase.from('platforms').update(payload).eq('id', editId))
-    } else {
-      ({ error: err } = await supabase.from('platforms').insert(payload))
-    }
+    const res = editId
+      ? await adminDb({ action: 'update', table: 'platforms', values, match: { id: editId } })
+      : await adminDb({ action: 'insert', table: 'platforms', values })
     setSaving(false)
-    if (err) { showToast('Xəta: ' + err.message); return }
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     setModalOpen(false)
     showToast(editId ? 'Platforma yeniləndi' : 'Platforma əlavə edildi')
     load()
@@ -64,15 +61,15 @@ export default function AdminPlatformsPage() {
 
   const remove = async (id: string) => {
     if (!confirm('Bu platformanı silmək istədiyinizə əminsiniz? Ona aid ölkələr də silinəcək.')) return
-    const { error } = await supabase.from('platforms').delete().eq('id', id)
-    if (error) { showToast('Xəta: ' + error.message); return }
+    const res = await adminDb({ action: 'delete', table: 'platforms', match: { id } })
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     showToast('Platforma silindi')
     load()
   }
 
   const toggleActive = async (p: Platform) => {
     setPlatforms(prev => prev.map(x => x.id === p.id ? { ...x, is_active: !x.is_active } : x))
-    await supabase.from('platforms').update({ is_active: !p.is_active }).eq('id', p.id)
+    await adminDb({ action: 'update', table: 'platforms', values: { is_active: !p.is_active }, match: { id: p.id } })
   }
 
   return (

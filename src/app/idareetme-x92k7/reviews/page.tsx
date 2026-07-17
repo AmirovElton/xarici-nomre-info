@@ -2,12 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { CheckCircle, XCircle, Star, AlertTriangle, Trash2, Home } from 'lucide-react'
-import { supabase } from '@/lib/supabase/client'
+import { adminDb } from '@/lib/admin-api'
 import type { Review, ReviewStatus } from '@/lib/types'
 import { AdminHeader, AdminLoading, AdminEmpty, Toast } from '@/components/admin/ui'
-import { cn } from '@/lib/utils'
 
-const statusTabs: { id: string; label: string }[] = [
+const statusTabs = [
   { id: 'all', label: 'Hamısı' },
   { id: 'pending', label: 'Gözləyən' },
   { id: 'approved', label: 'Təsdiqlənmiş' },
@@ -33,8 +32,8 @@ export default function AdminReviewsPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase.from('reviews').select('*').order('created_at', { ascending: false })
-    setReviews((data as Review[]) || [])
+    const { data } = await adminDb<Review[]>({ action: 'select', table: 'reviews', order: { column: 'created_at', ascending: false } })
+    setReviews(data || [])
     setLoading(false)
   }, [])
 
@@ -44,22 +43,22 @@ export default function AdminReviewsPage() {
 
   const setStatus = async (r: Review, status: ReviewStatus) => {
     setReviews(prev => prev.map(x => x.id === r.id ? { ...x, status } : x))
-    const { error } = await supabase.from('reviews').update({ status }).eq('id', r.id)
-    if (error) { showToast('Xəta: ' + error.message); load(); return }
+    const res = await adminDb({ action: 'update', table: 'reviews', values: { status }, match: { id: r.id } })
+    if (res.error) { showToast('Xəta: ' + res.error.message); load(); return }
     showToast('Status yeniləndi')
   }
 
   const toggleHome = async (r: Review) => {
     const next = !r.show_on_home
     setReviews(prev => prev.map(x => x.id === r.id ? { ...x, show_on_home: next } : x))
-    await supabase.from('reviews').update({ show_on_home: next }).eq('id', r.id)
+    await adminDb({ action: 'update', table: 'reviews', values: { show_on_home: next }, match: { id: r.id } })
     showToast(next ? 'Ana səhifədə göstəriləcək' : 'Ana səhifədən çıxarıldı')
   }
 
   const remove = async (id: string) => {
     if (!confirm('Bu rəyi silmək istədiyinizə əminsiniz?')) return
-    const { error } = await supabase.from('reviews').delete().eq('id', id)
-    if (error) { showToast('Xəta: ' + error.message); return }
+    const res = await adminDb({ action: 'delete', table: 'reviews', match: { id } })
+    if (res.error) { showToast('Xəta: ' + res.error.message); return }
     showToast('Rəy silindi')
     load()
   }
@@ -70,7 +69,6 @@ export default function AdminReviewsPage() {
     <div>
       <AdminHeader title="Rəylər" subtitle={`${reviews.length} rəy · ${pendingCount} gözləyir`} />
 
-      {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         {statusTabs.map(tab => (
           <button
@@ -112,7 +110,6 @@ export default function AdminReviewsPage() {
 
               <p style={{ color: 'var(--text-secondary)' }} className="text-sm mb-4">&ldquo;{r.message}&rdquo;</p>
 
-              {/* Actions */}
               <div className="flex items-center gap-2 flex-wrap pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                 {r.status !== 'approved' && (
                   <button onClick={() => setStatus(r, 'approved')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium" style={{ background: 'var(--success-muted)', color: 'var(--success)' }}>
@@ -132,7 +129,7 @@ export default function AdminReviewsPage() {
                     <Home size={12} /> {r.show_on_home ? 'Ana səhifədən çıxar' : 'Ana səhifədə göstər'}
                   </button>
                 )}
-                <button onClick={() => remove(r.id)} className={cn('flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium ml-auto')} style={{ background: 'var(--danger-muted)', color: 'var(--danger)' }}>
+                <button onClick={() => remove(r.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium ml-auto" style={{ background: 'var(--danger-muted)', color: 'var(--danger)' }}>
                   <Trash2 size={12} /> Sil
                 </button>
               </div>
