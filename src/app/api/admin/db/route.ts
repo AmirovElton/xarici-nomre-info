@@ -24,6 +24,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ data: null, error: { message: 'İcazə yoxdur.' } }, { status: 401 })
   }
 
+  // Verify Supabase server credentials are configured
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return NextResponse.json(
+      { data: null, error: { message: 'Server konfiqurasiyası yarımçıqdır: SUPABASE_SERVICE_ROLE_KEY və ya NEXT_PUBLIC_SUPABASE_URL Vercel-də təyin edilməyib.' } },
+      { status: 500 }
+    )
+  }
+
   let body: DbRequest
   try {
     body = await request.json()

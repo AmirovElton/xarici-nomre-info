@@ -1,67 +1,73 @@
 'use client'
 
-import { useState } from 'react'
-import { Star, MessageSquare } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Star, MessageSquare, Loader2 } from 'lucide-react'
 import ReviewForm from './ReviewForm'
-
-const approvedReviews = [
-  { id: '1', name: 'Elvin M.', platform: 'WhatsApp', country: 'Türkiyə', rating: 5, message: 'Çox sürətli xidmət. Nömrəni 5 dəqiqə ərzində aldım. Təlimatlar çox aydın idi.', created_at: '2026-07-10' },
-  { id: '2', name: 'Aysel K.', platform: 'WhatsApp', country: 'Böyük Britaniya', rating: 5, message: 'Premium nömrə aldım, 3 aydır heç bir problem olmadan istifadə edirəm. Tövsiyə edirəm.', created_at: '2026-07-08' },
-  { id: '3', name: 'Rəşad N.', platform: 'Telegram', country: 'Türkiyə', rating: 4, message: 'Telegram üçün nömrə aldım. Xidmət keyfiyyətli idi, təşəkkür edirəm.', created_at: '2026-07-05' },
-  { id: '4', name: 'Ləman H.', platform: 'WhatsApp', country: 'ABŞ', rating: 5, message: 'ABŞ nömrəsi aldım, premium keyfiyyətli idi. Artıq 2 aydır istifadə edirəm.', created_at: '2026-06-28' },
-  { id: '5', name: 'Tural V.', platform: 'WhatsApp', country: 'Türkiyə', rating: 4, message: 'Xidmət yaxşı idi. Təlimatlara əməl etdim və heç bir problem yaşamadım.', created_at: '2026-06-20' },
-]
+import { fetchApprovedReviews } from '@/lib/public-data'
+import type { Review } from '@/lib/types'
 
 export default function ReviewsClient() {
   const [showForm, setShowForm] = useState(false)
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchApprovedReviews().then((r) => {
+      setReviews(r)
+      setLoading(false)
+    })
+  }, [])
 
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
           <div className="text-center sm:text-left">
             <h1 className="section-title">Müştəri Rəyləri</h1>
             <p className="section-subtitle">Müştərilərimizin təcrübələri</p>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="btn-primary text-sm"
-          >
+          <button onClick={() => setShowForm(!showForm)} className="btn-primary text-sm">
             <MessageSquare size={16} />
             Rəy yaz
           </button>
         </div>
 
-        {/* Review Form */}
         {showForm && <ReviewForm onClose={() => setShowForm(false)} />}
 
-        {/* Reviews List */}
-        <div className="space-y-4">
-          {approvedReviews.map((review) => (
-            <div key={review.id} className="glass-card p-5">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-gray-100">{review.name}</h3>
-                  <p className="text-xs text-gray-500">{review.platform} - {review.country}</p>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
+          </div>
+        ) : reviews.length === 0 ? (
+          <div className="theme-card p-12 text-center">
+            <MessageSquare size={24} className="mx-auto mb-3" style={{ color: 'var(--text-faint)' }} />
+            <p style={{ color: 'var(--text-muted)' }} className="text-sm">Hələ təsdiqlənmiş rəy yoxdur. İlk rəyi siz yazın!</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {reviews.map((review) => (
+              <div key={review.id} className="theme-card p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 style={{ color: 'var(--text-primary)' }} className="font-semibold">{review.name}</h3>
+                    <p style={{ color: 'var(--text-faint)' }} className="text-xs">
+                      {review.platform}{review.country ? ` - ${review.country}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className={i < review.rating ? 'fill-current' : ''} style={{ color: i < review.rating ? 'var(--warning)' : 'var(--border-strong)' }} />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={14}
-                      className={i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}
-                    />
-                  ))}
-                </div>
+                <p style={{ color: 'var(--text-secondary)' }} className="text-sm leading-relaxed">&ldquo;{review.message}&rdquo;</p>
+                <p style={{ color: 'var(--text-faint)' }} className="text-xs mt-3">
+                  {new Date(review.created_at).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
               </div>
-              <p className="text-sm text-gray-300 leading-relaxed">&ldquo;{review.message}&rdquo;</p>
-              <p className="text-xs text-gray-600 mt-3">
-                {new Date(review.created_at).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

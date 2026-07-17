@@ -1,26 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { Search, ArrowLeft, RefreshCw } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { Search, ArrowLeft, RefreshCw, Loader2 } from 'lucide-react'
 import CountryCard from './CountryCard'
 import { WhatsAppIcon, TelegramIcon, GlobalIcon } from './PlatformIcons'
-
-const platforms = [
-  { id: '2', name: 'WhatsApp', icon: 'whatsapp', desc: 'WhatsApp nömrələri' },
-  { id: '3', name: 'Telegram', icon: 'telegram', desc: 'Telegram nömrələri' },
-  { id: '4', name: 'Digər', icon: 'global', desc: 'Digər platformalar' },
-]
-
-const countries = [
-  { id: '1', platform_id: '2', platform_name: 'WhatsApp', name: 'Türkiyə', flag: '🇹🇷', country_code: '+90', stock_count: 5, stock_status: 'in_stock' as const, price: 15, show_price: true, quality_level: 'Standart', stability_level: 'Orta', is_premium: false, is_popular: true, recommended_use: 'Şəxsi və biznes istifadəsi', short_description: 'Yeni hesab yaradılması üçün uyğun seçimdir.', last_updated: '2026-07-15T18:40:00Z' },
-  { id: '2', platform_id: '2', platform_name: 'WhatsApp', name: 'Böyük Britaniya', flag: '🇬🇧', country_code: '+44', stock_count: 3, stock_status: 'in_stock' as const, price: 35, show_price: true, quality_level: 'Premium', stability_level: 'Yüksək', is_premium: true, is_popular: true, recommended_use: 'Uzunmüddətli istifadə', short_description: 'Uzunmüddətli istifadə üçün üstünlük verilən seçimdir.', last_updated: '2026-07-15T16:20:00Z' },
-  { id: '3', platform_id: '2', platform_name: 'WhatsApp', name: 'ABŞ', flag: '🇺🇸', country_code: '+1', stock_count: 2, stock_status: 'low_stock' as const, price: 30, show_price: true, quality_level: 'Premium', stability_level: 'Yüksək', is_premium: true, is_popular: true, recommended_use: 'Biznes və şəxsi istifadə', short_description: 'Premium keyfiyyətli, stabil seçim.', last_updated: '2026-07-15T14:10:00Z' },
-  { id: '4', platform_id: '2', platform_name: 'WhatsApp', name: 'Filippin', flag: '🇵🇭', country_code: '+63', stock_count: 0, stock_status: 'out_of_stock' as const, price: null, show_price: false, quality_level: 'Standart', stability_level: null, is_premium: false, is_popular: false, recommended_use: null, short_description: 'Yaxın zamanda əlavə ediləcək.', last_updated: '2026-07-14T10:00:00Z' },
-  { id: '5', platform_id: '2', platform_name: 'WhatsApp', name: 'Hindistan', flag: '🇮🇳', country_code: '+91', stock_count: 4, stock_status: 'in_stock' as const, price: 12, show_price: true, quality_level: 'Standart', stability_level: 'Orta', is_premium: false, is_popular: false, recommended_use: 'Qısamüddətli istifadə', short_description: 'Qısa müddətli istifadə üçün əlverişli seçimdir.', last_updated: '2026-07-15T12:30:00Z' },
-  { id: '6', platform_id: '3', platform_name: 'Telegram', name: 'Türkiyə', flag: '🇹🇷', country_code: '+90', stock_count: 3, stock_status: 'in_stock' as const, price: 10, show_price: true, quality_level: 'Standart', stability_level: 'Orta', is_premium: false, is_popular: true, recommended_use: 'Yeni hesab yaratmaq', short_description: 'Telegram üçün uyğun seçim.', last_updated: '2026-07-15T17:00:00Z' },
-  { id: '7', platform_id: '3', platform_name: 'Telegram', name: 'Böyük Britaniya', flag: '🇬🇧', country_code: '+44', stock_count: 2, stock_status: 'in_stock' as const, price: 25, show_price: true, quality_level: 'Premium', stability_level: 'Yüksək', is_premium: true, is_popular: false, recommended_use: 'Uzunmüddətli istifadə', short_description: 'Premium və stabil Telegram nömrəsi.', last_updated: '2026-07-15T15:45:00Z' },
-  { id: '8', platform_id: '3', platform_name: 'Telegram', name: 'Rusiya', flag: '🇷🇺', country_code: '+7', stock_count: 6, stock_status: 'in_stock' as const, price: 8, show_price: true, quality_level: 'Standart', stability_level: 'Orta', is_premium: false, is_popular: true, recommended_use: 'Şəxsi istifadə', short_description: 'Geniş stokda olan əlverişli seçim.', last_updated: '2026-07-15T18:00:00Z' },
-]
+import { fetchActivePlatforms, fetchActiveCountries } from '@/lib/public-data'
+import type { Platform, Country } from '@/lib/types'
 
 const stockFilters = [
   { id: 'all', label: 'Hamısı' },
@@ -29,20 +14,36 @@ const stockFilters = [
   { id: 'popular', label: 'Ən çox seçilən' },
 ]
 
-function PlatformIcon({ type, size = 40 }: { type: string; size?: number }) {
-  if (type === 'whatsapp') return <WhatsAppIcon size={size} />
-  if (type === 'telegram') return <TelegramIcon size={size} />
+function PlatformIcon({ name, size = 40 }: { name: string; size?: number }) {
+  const n = name.toLowerCase()
+  if (n.includes('whatsapp')) return <WhatsAppIcon size={size} />
+  if (n.includes('telegram')) return <TelegramIcon size={size} />
   return <GlobalIcon size={size} />
 }
 
 export default function NumbersClient() {
+  const [platforms, setPlatforms] = useState<Platform[]>([])
+  const [countries, setCountries] = useState<Country[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [stockFilter, setStockFilter] = useState('all')
 
+  useEffect(() => {
+    Promise.all([fetchActivePlatforms(), fetchActiveCountries()]).then(([p, c]) => {
+      setPlatforms(p)
+      setCountries(c)
+      setLoading(false)
+    })
+  }, [])
+
+  const platformName = (id: string) => platforms.find(p => p.id === id)?.name || ''
+
   const filteredCountries = useMemo(() => {
     if (!selectedPlatform) return []
-    let result = countries.filter(c => c.platform_id === selectedPlatform)
+    let result = countries
+      .filter(c => c.platform_id === selectedPlatform)
+      .map(c => ({ ...c, platform_name: platformName(c.platform_id) }))
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
       result = result.filter(c => c.name.toLowerCase().includes(q) || c.country_code.includes(q))
@@ -51,7 +52,16 @@ export default function NumbersClient() {
     else if (stockFilter === 'premium') result = result.filter(c => c.is_premium)
     else if (stockFilter === 'popular') result = result.filter(c => c.is_popular)
     return result
-  }, [selectedPlatform, searchQuery, stockFilter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPlatform, searchQuery, stockFilter, countries, platforms])
+
+  if (loading) {
+    return (
+      <div className="px-4 py-6 flex items-center justify-center min-h-[50vh]">
+        <Loader2 size={28} className="animate-spin" style={{ color: 'var(--accent)' }} />
+      </div>
+    )
+  }
 
   // Platform Selection Screen
   if (!selectedPlatform) {
@@ -63,37 +73,31 @@ export default function NumbersClient() {
             <p className="section-subtitle">Platformanızı seçin</p>
           </div>
 
-          {/* 2-col grid for first two, 1-col for "Digər" */}
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-4">
-            {platforms.slice(0, 2).map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPlatform(p.id)}
-                className="theme-card p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300"
-              >
-                <PlatformIcon type={p.icon} size={40} />
-                <span style={{ color: 'var(--text-primary)' }} className="font-semibold">{p.name}</span>
-                <span style={{ color: 'var(--text-faint)' }} className="text-xs">{p.desc}</span>
-              </button>
-            ))}
-          </div>
-          <div className="max-w-[200px] mx-auto">
-            {platforms.slice(2).map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPlatform(p.id)}
-                className="theme-card p-6 w-full flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300"
-              >
-                <PlatformIcon type={p.icon} size={40} />
-                <span style={{ color: 'var(--text-primary)' }} className="font-semibold">{p.name}</span>
-                <span style={{ color: 'var(--text-faint)' }} className="text-xs">{p.desc}</span>
-              </button>
-            ))}
-          </div>
+          {platforms.length === 0 ? (
+            <div className="theme-card p-12 text-center max-w-md mx-auto">
+              <p style={{ color: 'var(--text-muted)' }} className="text-sm">
+                Hələ platforma əlavə edilməyib. Admin paneldən platforma əlavə edin.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+              {platforms.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPlatform(p.id)}
+                  className="theme-card p-6 flex flex-col items-center gap-3 hover:scale-[1.02] transition-all duration-300"
+                >
+                  <PlatformIcon name={p.name} size={40} />
+                  <span style={{ color: 'var(--text-primary)' }} className="font-semibold">{p.name}</span>
+                  {p.description && <span style={{ color: 'var(--text-faint)' }} className="text-xs">{p.description}</span>}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="mt-8 text-center flex items-center justify-center gap-2 text-xs" style={{ color: 'var(--text-faint)' }}>
             <RefreshCw size={12} />
-            <span>Stok məlumatları son dəfə 15 iyul 2026 tarixində yenilənib</span>
+            <span>Stok məlumatları mütəmadi yenilənir</span>
           </div>
         </div>
       </div>
@@ -104,7 +108,6 @@ export default function NumbersClient() {
   return (
     <div className="px-4 py-6 animate-fade-in">
       <div className="max-w-6xl mx-auto">
-        {/* Header with back button */}
         <div className="text-center mb-6">
           <button
             onClick={() => { setSelectedPlatform(null); setSearchQuery(''); setStockFilter('all') }}
@@ -113,11 +116,10 @@ export default function NumbersClient() {
           >
             <ArrowLeft size={16} /> Platformalar
           </button>
-          <h1 className="section-title">{platforms.find(p => p.id === selectedPlatform)?.name} Nömrələri</h1>
+          <h1 className="section-title">{platformName(selectedPlatform)} Nömrələri</h1>
           <p className="section-subtitle">Mövcud ölkələri və stok vəziyyətini görün</p>
         </div>
 
-        {/* Search Input */}
         <div className="relative max-w-lg mx-auto mb-5">
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-faint)' }} />
           <input
@@ -129,7 +131,6 @@ export default function NumbersClient() {
           />
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
           {stockFilters.map((f) => (
             <button
@@ -147,12 +148,10 @@ export default function NumbersClient() {
           ))}
         </div>
 
-        {/* Results count */}
         <p className="text-sm mb-4 text-center" style={{ color: 'var(--text-faint)' }}>
           {filteredCountries.length} nəticə
         </p>
 
-        {/* Country Cards */}
         {filteredCountries.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredCountries.map((c) => <CountryCard key={c.id} country={c} />)}
@@ -161,7 +160,7 @@ export default function NumbersClient() {
           <div className="theme-card p-12 text-center">
             <Search size={24} className="mx-auto mb-3" style={{ color: 'var(--text-faint)' }} />
             <h3 style={{ color: 'var(--text-secondary)' }} className="font-semibold mb-2">Nəticə tapılmadı</h3>
-            <p style={{ color: 'var(--text-faint)' }} className="text-sm">Axtarış parametrlərini dəyişdirin</p>
+            <p style={{ color: 'var(--text-faint)' }} className="text-sm">Bu platforma üçün hələ ölkə əlavə edilməyib və ya axtarışa uyğun nəticə yoxdur</p>
           </div>
         )}
       </div>

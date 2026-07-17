@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import SettingsProvider from '@/components/SettingsProvider'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import BottomNav from '@/components/layout/BottomNav'
@@ -15,11 +16,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="az">
       <body>
-        <Header />
-        <main className="pt-20 pb-24 md:pb-8">{children}</main>
-        <Footer />
-        <BottomNav />
-        <WhatsAppFloating />
+        <SettingsProvider>
+          <Header />
+          <main className="pt-20 pb-24 md:pb-8">{children}</main>
+          <Footer />
+          <BottomNav />
+          <WhatsAppFloating />
+        </SettingsProvider>
       </body>
     </html>
   )
