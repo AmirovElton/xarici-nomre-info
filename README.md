@@ -1,48 +1,32 @@
-# XariciNomrəAz
+# XariciNomreAz
 
-Xarici virtual nömrələr haqqında məlumatlandırıcı sayt.
+Xarici virtual nomre satisi ucun informasiya sayti.
+
+## Xususiyyetler
+
+- Dark theme (qara + mavi)
+- Glass effect bottom navigation
+- Platformalar > Olkeler > Qiymetler strukturu
+- WhatsApp avtomatik mesaj inteqrasiyasi
+- Admin panel (localStorage)
+- Mobil-uygun dizayn
+- Orta animasiyalar
+
+## Ise Salmaq
+
+```bash
+node server.js
+```
+
+- Sayt: http://localhost:3000
+- Admin: http://localhost:3000/admin.html
 
 ## Texnologiyalar
 
-- **Next.js 14** (App Router)
-- **Tailwind CSS** (Glassmorphism dizayn)
-- **Supabase** (PostgreSQL + Auth)
-- **TypeScript**
-- **Lucide React** (İkonlar)
-- **Framer Motion** (Animasiyalar)
+- HTML5 / CSS3 / Vanilla JavaScript
+- localStorage (sonra Supabase-e kecid)
+- Node.js server (development)
 
-## Quraşdırma
+## Deploy
 
-```bash
-npm install
-cp .env.local.example .env.local
-# .env.local faylına Supabase məlumatlarınızı daxil edin
-npm run dev
-```
-
-## Supabase Setup
-
-1. [supabase.com](https://supabase.com) hesab yaradın
-2. Yeni layihə yaradın
-3. SQL Editor-da `supabase/schema.sql` faylını işlədin
-4. Project Settings > API > URL və anon key kopyalayın
-5. `.env.local` faylına yapışdırın
-
-## Deploy (Vercel)
-
-1. [vercel.com](https://vercel.com) GitHub ilə giriş edin
-2. "Import Project" > bu repo-nu seçin
-3. Environment Variables əlavə edin:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-4. Deploy edin!
-
-## Sayt Strukturu
-
-- `/` - Ana səhifə
-- `/numbers` - Nömrələr (platforma seçimi, filtr, axtarış)
-- `/guide` - Bələdçi (FAQ, təlimat, proses)
-- `/premium` - Premium seçimlər
-- `/reviews` - Müştəri rəyləri
-- `/admin` - Admin panel (gizli)
+Vercel ve ya istənilən statik hosting ile deploy oluna bilər.

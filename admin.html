@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - XariciNomreAz</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Admin Header -->
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <h1>Admin Panel</h1>
+                <span class="admin-badge">XariciNomreAz</span>
+            </div>
+            <a href="index.html" class="back-to-site">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Sayta qayıt
+            </a>
+        </header>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchAdminTab('platforms')">Platformalar</button>
+            <button class="admin-tab" onclick="switchAdminTab('countries')">Ölkələr</button>
+            <button class="admin-tab" onclick="switchAdminTab('reviews')">Rəylər</button>
+            <button class="admin-tab" onclick="switchAdminTab('faqs')">FAQ</button>
+        </div>
+
+        <!-- Admin Content -->
+        <div class="admin-content">
+            <!-- Platforms Section -->
+            <div id="admin-platforms" class="admin-section active">
+                <div class="section-header">
+                    <h2>Platformalar</h2>
+                    <button class="add-button" onclick="showModal('platform')">+ Əlavə et</button>
+                </div>
+                <div class="admin-list" id="admin-platforms-list"></div>
+            </div>
+
+            <!-- Countries Section -->
+            <div id="admin-countries" class="admin-section">
+                <div class="section-header">
+                    <h2>Ölkələr</h2>
+                    <button class="add-button" onclick="showModal('country')">+ Əlavə et</button>
+                </div>
+                <div class="admin-filter">
+                    <select id="admin-country-filter" onchange="loadAdminCountries()">
+                        <option value="">Bütün platformalar</option>
+                    </select>
+                </div>
+                <div class="admin-list" id="admin-countries-list"></div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div id="admin-reviews" class="admin-section">
+                <div class="section-header">
+                    <h2>Müştəri Rəyləri</h2>
+                    <button class="add-button" onclick="showModal('review')">+ Əlavə et</button>
+                </div>
+                <div class="admin-list" id="admin-reviews-list"></div>
+            </div>
+
+            <!-- FAQs Section -->
+            <div id="admin-faqs" class="admin-section">
+                <div class="section-header">
+                    <h2>Tez-Tez Verilən Suallar</h2>
+                    <button class="add-button" onclick="showModal('faq')">+ Əlavə et</button>
+                </div>
+                <div class="admin-list" id="admin-faqs-list"></div>
+            </div>
+        </div>
+
+        <!-- Data Actions -->
+        <div class="admin-footer">
+            <button class="danger-button" onclick="confirmReset()">Bütün məlumatları sıfırla</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">Əlavə et</h3>
+                <button class="modal-close" onclick="hideModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic form content -->
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-button" onclick="hideModal()">Ləğv et</button>
+                <button class="save-button" id="modal-save" onclick="saveModal()">Yadda saxla</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
