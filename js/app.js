@@ -1,148 +1,73 @@
-// ===== App Controller =====
+// ===== XariciNomreAz App Controller =====
 
-const WHATSAPP_NUMBER = '994402821222';
 let currentPlatform = null;
 
-// ===== Navigation =====
+// ===== NAVIGATION =====
 function navigateTo(page) {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(p => {
-        p.classList.remove('active');
-    });
-
-    // Show target page
-    const targetPage = document.getElementById(`page-${page}`);
-    if (targetPage) {
-        targetPage.classList.add('active');
-        targetPage.classList.add('page-enter');
-        setTimeout(() => targetPage.classList.remove('page-enter'), 300);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(`page-${page}`);
+    if (target) {
+        target.classList.add('active');
+        target.classList.add('page-enter');
+        setTimeout(() => target.classList.remove('page-enter'), 250);
     }
 
-    // Update nav
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
-    if (activeNav) {
-        activeNav.classList.add('active');
-    }
+    if (activeNav) activeNav.classList.add('active');
 
-    // Load page data
+    // Load page content
     switch(page) {
-        case 'home':
-            loadHomeStats();
-            break;
-        case 'info':
-            loadFAQs();
-            break;
-        case 'numbers':
-            loadPlatforms();
-            break;
-        case 'reviews':
-            loadReviews();
-            break;
+        case 'home': loadHome(); break;
+        case 'numbers': loadNumbers(); break;
+        case 'info': loadInfo(); break;
+        case 'reviews': loadReviewsPage(); break;
     }
-
-    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ===== Home Page =====
-function loadHomeStats() {
+// ===== HOME PAGE =====
+function loadHome() {
+    updateWhatsAppLinks();
+}
+
+// ===== NUMBERS PAGE =====
+function loadNumbers() {
+    loadPlatformTabs();
+}
+
+function loadPlatformTabs() {
     const platforms = dataManager.getPlatforms();
-    const countries = dataManager.getCountries();
-    
-    animateNumber('stat-platforms', platforms.length);
-    
-    // Count unique countries
-    const uniqueCountries = [...new Set(countries.map(c => c.name))];
-    animateNumber('stat-countries', uniqueCountries.length);
-}
-
-function animateNumber(elementId, target) {
-    const element = document.getElementById(elementId);
-    if (!element || element.textContent.includes('+')) return;
-    
-    let current = 0;
-    const increment = Math.ceil(target / 20);
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        element.textContent = current;
-    }, 50);
-}
-
-// ===== FAQ =====
-function loadFAQs() {
-    const faqs = dataManager.getFaqs();
-    const container = document.getElementById('faq-list');
-    
-    if (faqs.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Hələ sual əlavə olunmayıb</p></div>';
-        return;
-    }
-
-    container.innerHTML = faqs.map(faq => `
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-question">
-                <span>${faq.question}</span>
-                <svg class="faq-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"/>
-                </svg>
-            </div>
-            <div class="faq-answer">
-                <p>${faq.answer}</p>
-            </div>
-        </div>
-    `).join('');
-}
-
-function toggleFaq(element) {
-    element.classList.toggle('active');
-}
-
-// ===== Numbers Page =====
-function loadPlatforms() {
-    const platforms = dataManager.getPlatforms();
-    const tabsContainer = document.getElementById('platforms-tabs');
+    const container = document.getElementById('platforms-tabs');
+    if (!container) return;
 
     if (platforms.length === 0) {
-        tabsContainer.innerHTML = '';
+        container.innerHTML = '';
         document.getElementById('countries-list').innerHTML = '<div class="empty-state"><p>Hələ platform əlavə olunmayıb</p></div>';
         return;
     }
 
-    tabsContainer.innerHTML = platforms.map((platform, index) => `
-        <button class="platform-tab ${index === 0 ? 'active' : ''}" 
-                data-platform-id="${platform.id}"
-                onclick="selectPlatform(${platform.id}, this)">
-            ${platform.icon} ${platform.name}
+    container.innerHTML = platforms.map((p, i) => `
+        <button class="platform-tab ${i === 0 ? 'active' : ''}" 
+                data-platform-id="${p.id}"
+                onclick="selectPlatform(${p.id}, this)">
+            ${p.icon} ${p.name}
         </button>
     `).join('');
 
-    // Load first platform's countries
-    if (!currentPlatform) {
-        currentPlatform = platforms[0].id;
-    }
+    if (!currentPlatform) currentPlatform = platforms[0].id;
     loadCountries(currentPlatform);
 }
 
-function selectPlatform(platformId, element) {
+function selectPlatform(platformId, el) {
     currentPlatform = platformId;
-    
-    // Update active tab
-    document.querySelectorAll('.platform-tab').forEach(tab => tab.classList.remove('active'));
-    element.classList.add('active');
-    
-    // Load countries
+    document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+    if (el) el.classList.add('active');
     loadCountries(platformId);
-    
-    // Clear search
-    document.getElementById('search-input').value = '';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
 }
+
 
 function loadCountries(platformId) {
     const countries = dataManager.getCountries(platformId);
@@ -155,83 +80,270 @@ function loadCountries(platformId) {
         return;
     }
 
-    container.innerHTML = countries.map(country => `
+    container.innerHTML = countries.map(country => {
+        const statusInfo = getStatusInfo(country.status);
+        const priceHtml = country.showPrice 
+            ? `<span class="country-price">${country.price} AZN</span>`
+            : `<span class="country-price hidden-price">Qiymət və mövcudluq üçün WhatsApp-dan məlumat alın.</span>`;
+        
+        const actionBtn = getActionButton(country, platformName);
+        
+        return `
         <div class="country-card scale-in" data-country-name="${country.name.toLowerCase()}">
-            <div class="country-info">
-                <span class="country-flag">${country.flag}</span>
-                <div class="country-details">
-                    <h4>${country.name}</h4>
-                    <span>${country.code}</span>
+            <div class="country-card-header">
+                <div class="country-info">
+                    <span class="country-flag">${country.flag}</span>
+                    <div class="country-details">
+                        <h4>${country.name}</h4>
+                        <span>${country.code} • ${platformName}</span>
+                    </div>
                 </div>
             </div>
-            <div class="country-action">
-                <span class="country-price">${country.price} AZN</span>
-                <button class="get-button ripple" onclick="getNumber('${platformName}', '${country.name}', '${country.code}')">
-                    Əldə Et
-                </button>
+            <div class="country-card-meta">
+                <span class="status-badge status-${statusInfo.color}">
+                    <span class="dot dot-pulse"></span>
+                    ${statusInfo.label}
+                </span>
+                ${country.stock > 0 ? `<span class="status-badge status-green">Stok: ${country.stock}</span>` : ''}
+                <span class="quality-badge">${country.quality}</span>
             </div>
-        </div>
-    `).join('');
+            ${country.note ? `<p class="country-note">${country.note}</p>` : ''}
+            <div class="country-card-footer">
+                ${priceHtml}
+                ${actionBtn}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function getStatusInfo(status) {
+    switch(status) {
+        case 'available': return { label: 'Stokda var', color: 'green' };
+        case 'low': return { label: 'Az qalıb', color: 'orange' };
+        case 'soon': return { label: 'Yaxın zamanda', color: 'blue' };
+        case 'unavailable': return { label: 'Müvəqqəti mövcud deyil', color: 'gray' };
+        case 'stopped': return { label: 'Satış dayandırılıb', color: 'red' };
+        default: return { label: 'Naməlum', color: 'gray' };
+    }
+}
+
+function getActionButton(country, platformName) {
+    if (country.status === 'available' || country.status === 'low') {
+        const url = dataManager.getCountryWhatsAppUrl(platformName, country.name);
+        return `<a href="${url}" target="_blank" class="get-info-btn">Məlumat al</a>`;
+    } else if (country.status === 'soon' || country.status === 'unavailable') {
+        const url = dataManager.getStockNotifyUrl(platformName, country.name);
+        return `<a href="${url}" target="_blank" class="stock-notify-btn">Stoka gələndə xəbər al</a>`;
+    }
+    return '';
 }
 
 function filterCountries() {
     const query = document.getElementById('search-input').value.toLowerCase().trim();
-    const cards = document.querySelectorAll('.country-card');
-
-    cards.forEach(card => {
+    document.querySelectorAll('.country-card').forEach(card => {
         const name = card.getAttribute('data-country-name');
-        if (name.includes(query)) {
-            card.style.display = 'flex';
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = name.includes(query) ? '' : 'none';
     });
 }
 
-// ===== WhatsApp Integration =====
-function getNumber(platform, country, code) {
-    const message = encodeURIComponent(`Salam! ${platform} üçün ${country} (${code}) nömrəsi əldə etmək istəyirəm.`);
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-    window.open(url, '_blank');
+
+// ===== INFO PAGE =====
+function loadInfo() {
+    loadAboutSection();
+    loadProcessSteps();
+    loadSafetyRules();
+    loadWhatsAppGuide();
+    loadTelegramGuide();
+    loadFaqSection();
 }
 
-// ===== Reviews =====
-function loadReviews() {
-    const reviews = dataManager.getReviews();
-    const container = document.getElementById('reviews-list');
+function switchInfoTab(tabId, el) {
+    document.querySelectorAll('.info-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.info-tab').forEach(t => t.classList.remove('active'));
+    const section = document.getElementById(`info-${tabId}`);
+    if (section) section.classList.add('active');
+    if (el) el.classList.add('active');
+}
 
-    if (reviews.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Hələ rəy əlavə olunmayıb</p></div>';
-        return;
-    }
+function switchGuideTab(tabId, el) {
+    document.querySelectorAll('.guide-content').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+    const section = document.getElementById(tabId);
+    if (section) section.classList.add('active');
+    if (el) el.classList.add('active');
+}
 
-    container.innerHTML = reviews.map(review => `
-        <div class="review-card fade-in-up">
-            <div class="review-header">
-                <div class="review-avatar">${review.name.charAt(0)}</div>
-                <div class="review-meta">
-                    <h4>${review.name}</h4>
-                    <span>${formatDate(review.date)}</span>
-                </div>
-                <div class="review-stars">${getStars(review.rating)}</div>
+// About accordion
+function loadAboutSection() {
+    const items = dataManager.getAboutItems();
+    const container = document.getElementById('about-accordion');
+    if (!container) return;
+    container.innerHTML = items.map(item => createAccordionItem(item.title, item.content)).join('');
+}
+
+// Process steps
+function loadProcessSteps() {
+    const steps = dataManager.getProcessSteps();
+    const container = document.getElementById('process-steps');
+    if (!container) return;
+    container.innerHTML = steps.map(step => `
+        <div class="step-card">
+            <div class="step-number">${step.id}</div>
+            <div class="step-content">
+                <h3>${step.title}</h3>
+                <p>${step.description}</p>
             </div>
-            <p class="review-text">${review.text}</p>
         </div>
     `).join('');
 }
 
-function getStars(rating) {
-    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+// Safety rules
+function loadSafetyRules() {
+    const rules = dataManager.getSafetyRules();
+    const dontsContainer = document.getElementById('safety-donts');
+    const dosContainer = document.getElementById('safety-dos');
+    if (!dontsContainer || !dosContainer) return;
+
+    dontsContainer.innerHTML = `
+        <h4>❌ İlk 24 saat EDİLMƏMƏLİ olanlar:</h4>
+        <ul>${(rules.donts || []).map(d => `<li>${d}</li>`).join('')}</ul>
+    `;
+    dosContainer.innerHTML = `
+        <h4>✅ İlk 24 saat TÖVSİYƏ olunanlar:</h4>
+        <ul>${(rules.dos || []).map(d => `<li>${d}</li>`).join('')}</ul>
+    `;
 }
 
-function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const months = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn', 'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'];
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+// WhatsApp guide
+function loadWhatsAppGuide() {
+    const guide = dataManager.getWhatsAppGuide();
+    const container = document.getElementById('wa-guide-accordion');
+    const containerAndroid = document.getElementById('wa-guide-android-accordion');
+    if (!container) return;
+    // Same content for both (can be differentiated later)
+    const html = guide.map(item => createAccordionItem(item.title, item.content)).join('');
+    container.innerHTML = html;
+    if (containerAndroid) containerAndroid.innerHTML = html;
 }
 
-// ===== Initialize App =====
+// Telegram guide
+function loadTelegramGuide() {
+    const guide = dataManager.getTelegramGuide();
+    const container = document.getElementById('tg-guide-accordion');
+    if (!container) return;
+    container.innerHTML = guide.map(item => createAccordionItem(item.title, item.content)).join('');
+}
+
+// FAQ
+function loadFaqSection() {
+    const faqs = dataManager.getFaqs();
+    const container = document.getElementById('faq-list');
+    if (!container) return;
+    if (faqs.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Hələ sual əlavə olunmayıb</p></div>';
+        return;
+    }
+    container.innerHTML = faqs.map(faq => createAccordionItem(faq.question, faq.answer)).join('');
+}
+
+
+// ===== ACCORDION HELPER =====
+function createAccordionItem(title, content) {
+    // Convert newlines and bullet points to HTML
+    const htmlContent = formatContent(content);
+    return `
+        <div class="accordion-item">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>${title}</span>
+                <svg class="accordion-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="accordion-body">
+                ${htmlContent}
+            </div>
+        </div>
+    `;
+}
+
+function formatContent(text) {
+    if (!text) return '';
+    // Split by newlines
+    const lines = text.split('\n').filter(l => l.trim());
+    let html = '';
+    let inList = false;
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('•') || trimmed.startsWith('*')) {
+            if (!inList) { html += '<ul>'; inList = true; }
+            html += `<li>${trimmed.substring(1).trim()}</li>`;
+        } else if (/^\d+\./.test(trimmed)) {
+            if (!inList) { html += '<ul>'; inList = true; }
+            html += `<li>${trimmed.replace(/^\d+\.\s*/, '')}</li>`;
+        } else {
+            if (inList) { html += '</ul>'; inList = false; }
+            if (trimmed.startsWith('⚠️')) {
+                html += `<p style="color: var(--status-orange); font-weight: 500; margin-top: 8px;">${trimmed}</p>`;
+            } else {
+                html += `<p>${trimmed}</p>`;
+            }
+        }
+    });
+    if (inList) html += '</ul>';
+    return html;
+}
+
+function toggleAccordion(header) {
+    const item = header.parentElement;
+    item.classList.toggle('active');
+}
+
+// ===== WHATSAPP LINKS =====
+function updateWhatsAppLinks() {
+    const settings = dataManager.getSettings();
+    const defaultUrl = dataManager.getWhatsAppUrl();
+
+    // Hero WhatsApp button
+    const heroBtn = document.getElementById('hero-whatsapp-btn');
+    if (heroBtn) heroBtn.href = defaultUrl;
+
+    // Nav WhatsApp button
+    const navBtn = document.getElementById('nav-whatsapp-btn');
+    if (navBtn) navBtn.href = defaultUrl;
+
+    // Floating WhatsApp
+    const floatBtn = document.getElementById('whatsapp-float');
+    if (floatBtn) floatBtn.href = defaultUrl;
+}
+
+// ===== FOOTER =====
+function loadFooter() {
+    const settings = dataManager.getSettings();
+    const container = document.getElementById('footer-contacts');
+    if (!container) return;
+
+    let html = '';
+    if (settings.whatsappNumber) {
+        html += `<a href="https://wa.me/${settings.whatsappNumber}" target="_blank" class="footer-contact-item">💬 WhatsApp</a>`;
+    }
+    if (settings.instagram) {
+        html += `<a href="https://instagram.com/${settings.instagram}" target="_blank" class="footer-contact-item">📷 @${settings.instagram}</a>`;
+    }
+    if (settings.telegram) {
+        html += `<a href="https://t.me/${settings.telegram}" target="_blank" class="footer-contact-item">✈️ Telegram</a>`;
+    }
+    if (settings.email) {
+        html += `<a href="mailto:${settings.email}" class="footer-contact-item">📧 ${settings.email}</a>`;
+    }
+    if (settings.workingHours) {
+        html += `<span class="footer-contact-item">🕐 ${settings.workingHours}</span>`;
+    }
+    container.innerHTML = html;
+}
+
+// ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
-    loadHomeStats();
-    loadFAQs();
+    loadHome();
+    loadInfo();
+    loadFooter();
+    updateWhatsAppLinks();
 });

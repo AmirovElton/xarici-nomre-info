@@ -3,33 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XariciNomreAz - Anonim və Təhlükəsiz ol!</title>
-    <meta name="description" content="Xarici virtual nömrələr - WhatsApp, Telegram və digər platformalar üçün. Anonim və təhlükəsiz!">
+    <title>XariciNomreAz - Xarici Virtual Nomreler Haqqinda Bilmeli Oldugunuz Her Sey</title>
+    <meta name="description" content="Xarici virtual nomreler haqqinda tam melumat. WhatsApp, Telegram ve diger platformalar ucun olke secimi, stok veziyyeti, istifade qaydalari.">
+    <meta property="og:title" content="XariciNomreAz - Anonim ve Tehlukesiz ol!">
+    <meta property="og:description" content="Platformaniza uygun olkeleri, aktual stok veziyyetini ve tehlukesizlik tovsiyelerini oyrein.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/og-image.png">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://xaricinomre.az">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Main App Container -->
     <div id="app" class="app-container">
-        <!-- Pages -->
-        <main id="main-content" class="main-content">
-            <!-- Ana Menu Page -->
+        <main class="main-content">
+
+            <!-- ===== ANA SƏHIFƏ ===== -->
             <section id="page-home" class="page active">
                 <div class="hero-section">
                     <div class="hero-bg-effects">
                         <div class="glow-circle glow-1"></div>
                         <div class="glow-circle glow-2"></div>
+                        <div class="glow-circle glow-3"></div>
                     </div>
                     <div class="hero-content fade-in-up">
                         <div class="logo-container">
                             <div class="logo-icon">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                    <circle cx="24" cy="24" r="22" stroke="url(#grad1)" stroke-width="2"/>
-                                    <path d="M16 20C16 17.7909 17.7909 16 20 16H28C30.2091 16 32 17.7909 32 20V28C32 30.2091 30.2091 32 28 32H20C17.7909 32 16 30.2091 16 28V20Z" fill="url(#grad1)" opacity="0.2"/>
-                                    <path d="M20 24L23 27L28 21" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                                    <circle cx="28" cy="28" r="26" stroke="url(#logoGrad)" stroke-width="2"/>
+                                    <path d="M18 24C18 21.2 20.2 19 23 19H33C35.8 19 38 21.2 38 24V32C38 34.8 35.8 37 33 37H23C20.2 37 18 34.8 18 32V24Z" fill="url(#logoGrad)" opacity="0.15"/>
+                                    <path d="M22 28L26 32L34 24" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     <defs>
-                                        <linearGradient id="grad1" x1="0" y1="0" x2="48" y2="48">
+                                        <linearGradient id="logoGrad" x1="0" y1="0" x2="56" y2="56">
                                             <stop offset="0%" stop-color="#38bdf8"/>
                                             <stop offset="100%" stop-color="#1e3a5f"/>
                                         </linearGradient>
@@ -39,101 +46,77 @@
                             <h1 class="brand-name">XariciNomre<span class="brand-accent">Az</span></h1>
                         </div>
                         <p class="slogan">Anonim və Təhlükəsiz ol!</p>
-                        <p class="hero-description">Dünyann istənilən ölkəsinin virtual nömrəsini əldə et. WhatsApp, Telegram və digər platformalar üçün.</p>
-                        <button class="cta-button pulse-glow" onclick="navigateTo('numbers')">
-                            <span>Nömrələrə Bax</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <!-- Stats -->
-                    <div class="stats-container fade-in-up delay-200">
-                        <div class="stat-card">
-                            <span class="stat-number" id="stat-countries">0</span>
-                            <span class="stat-label">Ölkə</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" id="stat-platforms">0</span>
-                            <span class="stat-label">Platform</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" id="stat-customers">500+</span>
-                            <span class="stat-label">Müştəri</span>
+
+                        <h2 class="hero-title">Xarici virtual nömrələr haqqında bilməli olduğunuz hər şey</h2>
+                        <p class="hero-description">Platformanıza uyğun ölkələri, aktual stok vəziyyətini, istifadə qaydalarını və təhlükəsizlik tövsiyələrini sifarişdən əvvəl öyrənin.</p>
+                        <div class="hero-buttons">
+                            <button class="cta-button primary" onclick="navigateTo('numbers')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                Nömrələrə bax
+                            </button>
+                            <button class="cta-button secondary" onclick="navigateTo('info')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                İstifadə qaydaları
+                            </button>
+                            <a href="#" id="hero-whatsapp-btn" class="cta-button whatsapp-btn" target="_blank">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                WhatsApp əlaqə
+                            </a>
                         </div>
                     </div>
-                    <!-- Features -->
-                    <div class="features-grid fade-in-up delay-400">
+
+                    <!-- Üstünlük kartları -->
+                    <div class="features-grid fade-in-up delay-200">
                         <div class="feature-card">
-                            <div class="feature-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            </div>
-                            <h3>Təhlükəsiz</h3>
-                            <p>Tam anonim alış-veriş</p>
+                            <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                            <h3>Aktual stok</h3>
+                            <p>Real vaxt məlumatları</p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                            </div>
-                            <h3>Sürətli</h3>
-                            <p>Dəqiqələr içində aktivləşdir</p>
+                            <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                            <h3>Ölkə seçimi</h3>
+                            <p>Platformaya uyğun</p>
                         </div>
                         <div class="feature-card">
-                            <div class="feature-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                            </div>
-                            <h3>Dəstək</h3>
-                            <p>7/24 WhatsApp dəstəyi</p>
+                            <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                            <h3>Təlimat</h3>
+                            <p>Addım-addım izah</p>
                         </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                            <h3>Tam məlumat</h3>
+                            <p>Sifarişdən əvvəl</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+                            <h3>Premium</h3>
+                            <p>Stabil seçimlər</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                            <h3>WhatsApp</h3>
+                            <p>Birbaşa dəstək</p>
+                        </div>
+                    </div>
+
+                    <!-- Xəbərdarlıq bloku -->
+                    <div class="warning-card fade-in-up delay-400">
+                        <div class="warning-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <p>Bu sayt məlumatlandırma xarakterlidir. Sifariş və ödəniş yalnız XariciNomrəAz-ın rəsmi WhatsApp əlaqəsi vasitəsilə həyata keçirilir.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Məlumat Page -->
-            <section id="page-info" class="page">
-                <div class="page-header">
-                    <h2>Necə İşləyir?</h2>
-                    <p>Sadəcə 3 addımda nömrəni əldə et</p>
-                </div>
-                <div class="steps-container">
-                    <div class="step-card fade-in-up">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h3>Platform və Ölkə Seç</h3>
-                            <p>WhatsApp, Telegram və ya digər platformalar üçün istədiyin ölkənin nömrəsini seç.</p>
-                        </div>
-                    </div>
-                    <div class="step-card fade-in-up delay-200">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h3>Bizimlə Əlaqə Saxla</h3>
-                            <p>"Əldə Et" düyməsinə bas və WhatsApp vasitəsilə bizimlə əlaqə saxla.</p>
-                        </div>
-                    </div>
-                    <div class="step-card fade-in-up delay-400">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h3>Nömrəni Al</h3>
-                            <p>Ödənişi həyata keçir və nömrəni dərhal aktivləşdir.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FAQ Section -->
-                <div class="faq-section">
-                    <h2>Tez-Tez Verilən Suallar</h2>
-                    <div class="faq-list" id="faq-list">
-                        <!-- FAQ items will be loaded dynamically -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Nömrələr Page -->
+            <!-- ===== NÖMRƏLƏR SƏHIFƏSI ===== -->
             <section id="page-numbers" class="page">
                 <div class="page-header">
                     <h2>Nömrələr</h2>
-                    <p>Platform seçin və ölkə nömrələrinə baxın</p>
+                    <p>Platform seçin və ölkə stok vəziyyətinə baxın</p>
                 </div>
+                <!-- Platform Tabs -->
+                <div class="platforms-tabs" id="platforms-tabs"></div>
                 <!-- Search -->
                 <div class="search-container">
                     <div class="search-box">
@@ -141,68 +124,184 @@
                         <input type="text" id="search-input" placeholder="Ölkə axtar..." oninput="filterCountries()">
                     </div>
                 </div>
-                <!-- Platforms Tabs -->
-                <div class="platforms-tabs" id="platforms-tabs">
-                    <!-- Platforms will be loaded dynamically -->
-                </div>
                 <!-- Countries List -->
-                <div class="countries-list" id="countries-list">
-                    <!-- Countries will be loaded dynamically -->
+                <div class="countries-list" id="countries-list"></div>
+            </section>
+
+            <!-- ===== MƏLUMAT SƏHIFƏSI ===== -->
+            <section id="page-info" class="page">
+                <div class="page-header">
+                    <h2>Məlumat</h2>
+                    <p>İstifadə qaydaları, təhlükəsizlik və proses</p>
+                </div>
+
+                <!-- Info Tabs -->
+                <div class="info-tabs">
+                    <button class="info-tab active" onclick="switchInfoTab('about', this)">Haqqında</button>
+                    <button class="info-tab" onclick="switchInfoTab('process', this)">Proses</button>
+                    <button class="info-tab" onclick="switchInfoTab('safety', this)">Təhlükəsizlik</button>
+                    <button class="info-tab" onclick="switchInfoTab('whatsapp-guide', this)">WhatsApp</button>
+                    <button class="info-tab" onclick="switchInfoTab('telegram-guide', this)">Telegram</button>
+                    <button class="info-tab" onclick="switchInfoTab('faq', this)">FAQ</button>
+                </div>
+
+                <!-- About Section -->
+                <div id="info-about" class="info-section active">
+                    <div class="accordion-list" id="about-accordion"></div>
+                </div>
+
+                <!-- Process Section -->
+                <div id="info-process" class="info-section">
+                    <div class="steps-container" id="process-steps"></div>
+                </div>
+
+                <!-- Safety Section (İlk 24 saat) -->
+                <div id="info-safety" class="info-section">
+                    <div class="safety-warning">
+                        <h3>⚠️ İlk 24 saat hesabın təhlükəsizliyi üçün vacibdir</h3>
+                        <p>Bu müddət tövsiyə olunan minimum uyğunlaşma müddətidir.</p>
+                    </div>
+                    <div class="two-columns">
+                        <div class="dont-list" id="safety-donts"></div>
+                        <div class="do-list" id="safety-dos"></div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Guide -->
+                <div id="info-whatsapp-guide" class="info-section">
+                    <div class="guide-tabs">
+                        <button class="guide-tab active" onclick="switchGuideTab('wa-iphone', this)">iPhone</button>
+                        <button class="guide-tab" onclick="switchGuideTab('wa-android', this)">Android</button>
+                    </div>
+                    <div id="wa-iphone" class="guide-content active">
+                        <div class="accordion-list" id="wa-guide-accordion"></div>
+                    </div>
+                    <div id="wa-android" class="guide-content">
+                        <div class="accordion-list" id="wa-guide-android-accordion"></div>
+                    </div>
+                </div>
+
+                <!-- Telegram Guide -->
+                <div id="info-telegram-guide" class="info-section">
+                    <div class="accordion-list" id="tg-guide-accordion"></div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div id="info-faq" class="info-section">
+                    <div class="accordion-list" id="faq-list"></div>
                 </div>
             </section>
 
-            <!-- Rəylər Page -->
+            <!-- ===== RƏYLƏR SƏHIFƏSI ===== -->
             <section id="page-reviews" class="page">
                 <div class="page-header">
                     <h2>Müştəri Rəyləri</h2>
                     <p>Müştərilərimizin fikirləri</p>
                 </div>
-                <div class="reviews-list" id="reviews-list">
-                    <!-- Reviews will be loaded dynamically -->
+                <!-- Review Form -->
+                <div class="review-form-card" id="review-form-card">
+                    <h3>Rəy yazın</h3>
+                    <form id="review-form" onsubmit="submitReview(event)">
+                        <div class="form-group">
+                            <label>Ad və ya ləqəb *</label>
+                            <input type="text" id="review-name" required placeholder="Adınız">
+                        </div>
+                        <div class="form-group">
+                            <label>Platforma *</label>
+                            <select id="review-platform" required>
+                                <option value="">Seçin...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ölkə (ixtiyari)</label>
+                            <input type="text" id="review-country" placeholder="Məs: Türkiyə">
+                        </div>
+                        <div class="form-group">
+                            <label>Qiymətləndirmə *</label>
+                            <div class="star-rating" id="star-rating">
+                                <span class="star" data-value="1">☆</span>
+                                <span class="star" data-value="2">☆</span>
+                                <span class="star" data-value="3">☆</span>
+                                <span class="star" data-value="4">☆</span>
+                                <span class="star" data-value="5">☆</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Rəy mətni *</label>
+                            <textarea id="review-text" required placeholder="Təcrübəniz haqqında yazın..." rows="3"></textarea>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="review-privacy" required>
+                            <label for="review-privacy">Rəyimin saytda yayımlanmasına razıyam</label>
+                        </div>
+                        <button type="submit" class="submit-review-btn">Göndər</button>
+                    </form>
+                    <div id="review-success" class="review-success hidden">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-light)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <p>Rəyiniz qəbul edildi. Admin yoxlamasından sonra saytda yayımlanacaq.</p>
+                    </div>
                 </div>
+                <!-- Approved Reviews -->
+                <div class="reviews-list" id="reviews-list"></div>
             </section>
+
         </main>
 
-        <!-- Bottom Navigation Bar -->
-        <nav class="bottom-nav glass-effect">
+        <!-- ===== FOOTER ===== -->
+        <footer class="site-footer" id="site-footer">
+            <div class="footer-brand">
+                <span class="footer-logo">XariciNomre<span class="brand-accent">Az</span></span>
+                <p>Anonim və Təhlükəsiz ol!</p>
+            </div>
+            <div class="footer-warning">
+                <p>⚠️ Yalnız XariciNomrəAz-ın bu saytda göstərilən rəsmi WhatsApp və sosial media hesabları vasitəsilə əlaqə saxlayın. Başqa şəxslərə və ya saxta hesablara edilən ödənişlərə görə XariciNomrəAz məsuliyyət daşımır.</p>
+            </div>
+            <div class="footer-contacts" id="footer-contacts"></div>
+            <div class="footer-links">
+                <a href="pages/terms.html">Qaydalar və şərtlər</a>
+                <a href="pages/privacy.html">Məxfilik siyasəti</a>
+                <a href="pages/usage.html">İstifadə qaydaları</a>
+                <a href="pages/refund.html">Geri qaytarma</a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2026 XariciNomrəAz. Bütün hüquqlar qorunur.</p>
+                <p class="footer-disclaimer">Platformaların adları və loqoları onların müvafiq sahiblərinə aiddir. XariciNomrəAz həmin platformaların rəsmi tərəfdaşı deyildir.</p>
+            </div>
+        </footer>
+
+        <!-- ===== BOTTOM NAVIGATION ===== -->
+        <nav class="bottom-nav glass-nav">
             <button class="nav-item active" data-page="home" onclick="navigateTo('home')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9,22 9,12 15,12 15,22"/>
-                </svg>
-                <span>Ana Menu</span>
-            </button>
-            <button class="nav-item" data-page="info" onclick="navigateTo('info')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 16v-4M12 8h.01"/>
-                </svg>
-                <span>Məlumat</span>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+                <span>Ana səhifə</span>
             </button>
             <button class="nav-item" data-page="numbers" onclick="navigateTo('numbers')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 <span>Nömrələr</span>
             </button>
+            <button class="nav-item" data-page="info" onclick="navigateTo('info')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <span>Məlumat</span>
+            </button>
             <button class="nav-item" data-page="reviews" onclick="navigateTo('reviews')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 <span>Rəylər</span>
             </button>
+            <a href="#" id="nav-whatsapp-btn" class="nav-item nav-whatsapp" target="_blank">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <span>Sifariş</span>
+            </a>
         </nav>
 
-        <!-- Floating WhatsApp Button -->
-        <a href="https://wa.me/994402821222" target="_blank" class="whatsapp-float pulse-glow" id="whatsapp-float">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-            </svg>
+        <!-- Floating WhatsApp -->
+        <a href="#" id="whatsapp-float" class="whatsapp-float" target="_blank">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <span class="float-text">WhatsApp-dan sifariş et</span>
         </a>
     </div>
 
-    <!-- Scripts -->
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/reviews.js"></script>
 </body>
 </html>

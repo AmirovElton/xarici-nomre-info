@@ -1,421 +1,349 @@
 // ===== Admin Panel Controller =====
-
 let currentModalType = null;
-let editingItemId = null;
+let editingId = null;
+let currentReviewFilter = 'all';
 
-// ===== Tab Switching =====
-function switchAdminTab(tab) {
+// ===== TAB SWITCHING =====
+function switchAdminTab(tab, el) {
     document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    
     document.getElementById(`admin-${tab}`).classList.add('active');
-    event.target.classList.add('active');
+    if (el) el.classList.add('active');
 
-    // Load data
     switch(tab) {
-        case 'platforms':
-            loadAdminPlatforms();
-            break;
-        case 'countries':
-            loadAdminCountries();
-            loadCountryFilter();
-            break;
-        case 'reviews':
-            loadAdminReviews();
-            break;
-        case 'faqs':
-            loadAdminFaqs();
-            break;
+        case 'countries': loadCountryFilter(); loadAdminCountries(); break;
+        case 'platforms': loadAdminPlatforms(); break;
+        case 'reviews': loadAdminReviews(); break;
+        case 'faqs': loadAdminFaqs(); break;
+        case 'settings': loadSettings(); break;
     }
 }
 
-// ===== Load Admin Data =====
-function loadAdminPlatforms() {
-    const platforms = dataManager.getAllPlatforms().filter(p => p.active);
-    const container = document.getElementById('admin-platforms-list');
-
-    if (platforms.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Heç bir platform yoxdur</p></div>';
-        return;
-    }
-
-    container.innerHTML = platforms.map(platform => `
-        <div class="admin-item">
-            <div class="admin-item-info">
-                <span class="admin-item-icon">${platform.icon}</span>
-                <div class="admin-item-details">
-                    <h4>${platform.name}</h4>
-                    <span>ID: ${platform.id}</span>
-                </div>
-            </div>
-            <div class="admin-item-actions">
-                <button class="edit-btn" onclick="editItem('platform', ${platform.id})">Redaktə</button>
-                <button class="delete-btn" onclick="deleteItem('platform', ${platform.id})">Sil</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function loadAdminCountries() {
-    const filterValue = document.getElementById('admin-country-filter')?.value;
-    let countries = dataManager.getAllCountries().filter(c => c.active);
-    
-    if (filterValue) {
-        countries = countries.filter(c => c.platformId === parseInt(filterValue));
-    }
-
-    const container = document.getElementById('admin-countries-list');
-    const platforms = dataManager.getAllPlatforms();
-
-    if (countries.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Heç bir ölkə yoxdur</p></div>';
-        return;
-    }
-
-    container.innerHTML = countries.map(country => {
-        const platform = platforms.find(p => p.id === country.platformId);
-        return `
-            <div class="admin-item">
-                <div class="admin-item-info">
-                    <span class="admin-item-icon">${country.flag}</span>
-                    <div class="admin-item-details">
-                        <h4>${country.name} (${country.code})</h4>
-                        <span>${platform ? platform.name : 'N/A'} • ${country.price} AZN</span>
-                    </div>
-                </div>
-                <div class="admin-item-actions">
-                    <button class="edit-btn" onclick="editItem('country', ${country.id})">Redaktə</button>
-                    <button class="delete-btn" onclick="deleteItem('country', ${country.id})">Sil</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
+// ===== COUNTRIES =====
 function loadCountryFilter() {
     const platforms = dataManager.getPlatforms();
     const select = document.getElementById('admin-country-filter');
-    
-    select.innerHTML = '<option value="">Bütün platformalar</option>' + 
+    if (!select) return;
+    select.innerHTML = '<option value="">Bütün platformalar</option>' +
         platforms.map(p => `<option value="${p.id}">${p.icon} ${p.name}</option>`).join('');
 }
 
+function loadAdminCountries() {
+    const filterVal = document.getElementById('admin-country-filter')?.value;
+    let countries = dataManager.getAllCountries().filter(c => c.active);
+    if (filterVal) countries = countries.filter(c => c.platformId === parseInt(filterVal));
+    const platforms = dataManager.getAllPlatforms();
+    const container = document.getElementById('admin-countries-list');
+
+    if (countries.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Ölkə yoxdur</p></div>';
+        return;
+    }
+
+    container.innerHTML = countries.map(c => {
+        const pl = platforms.find(p => p.id === c.platformId);
+        const statusLabel = getStatusLabel(c.status);
+        return `
+        <div class="admin-item">
+            <div class="admin-item-row">
+                <div class="admin-item-info">
+                    <span class="admin-item-icon">${c.flag}</span>
+                    <div class="admin-item-details">
+                        <h4>${c.name} (${c.code})</h4>
+                        <span>${pl ? pl.name : '?'} • ${c.quality} • Stok: ${c.stock} • ${statusLabel} ${c.showPrice ? '• ' + c.price + ' AZN' : '• Qiymət gizli'}</span>
+                    </div>
+                </div>
+                <div class="admin-item-actions">
+                    <button class="action-btn btn-edit" onclick="editCountry(${c.id})">Redaktə</button>
+                    <button class="action-btn btn-delete" onclick="deleteCountry(${c.id})">Sil</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function getStatusLabel(status) {
+    const map = { available: 'Stokda', low: 'Az', soon: 'Tezliklə', unavailable: 'Yoxdur', stopped: 'Dayandırılıb' };
+    return map[status] || status;
+}
+
+
+function showCountryModal(id = null) {
+    currentModalType = 'country';
+    editingId = id;
+    const platforms = dataManager.getPlatforms();
+    document.getElementById('modal-title').textContent = id ? 'Ölkəni redaktə et' : 'Ölkə əlavə et';
+    document.getElementById('modal-body').innerHTML = `
+        <div class="form-group"><label>Platform</label>
+            <select id="f-country-platform">${platforms.map(p => `<option value="${p.id}">${p.icon} ${p.name}</option>`).join('')}</select>
+        </div>
+        <div class="form-group"><label>Ölkə adı</label><input type="text" id="f-country-name" placeholder="Türkiyə"></div>
+        <div class="form-group"><label>Ölkə kodu</label><input type="text" id="f-country-code" placeholder="+90"></div>
+        <div class="form-group"><label>Bayraq (emoji)</label><input type="text" id="f-country-flag" placeholder="🇹🇷"></div>
+        <div class="form-group"><label>Stok sayı</label><input type="number" id="f-country-stock" min="0" placeholder="0"></div>
+        <div class="form-group"><label>Status</label>
+            <select id="f-country-status">
+                <option value="available">Stokda var</option>
+                <option value="low">Az qalıb</option>
+                <option value="soon">Yaxın zamanda</option>
+                <option value="unavailable">Müvəqqəti mövcud deyil</option>
+                <option value="stopped">Satış dayandırılıb</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Keyfiyyət</label>
+            <select id="f-country-quality">
+                <option value="Standard">Standard</option>
+                <option value="Premium">Premium</option>
+                <option value="VIP">VIP</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Qiymət (AZN)</label><input type="number" id="f-country-price" min="0" placeholder="10"></div>
+        <div class="form-group">
+            <div class="checkbox-row"><input type="checkbox" id="f-country-showprice" checked><label for="f-country-showprice">Qiyməti göstər</label></div>
+        </div>
+        <div class="form-group"><label>Əlavə qeyd</label><input type="text" id="f-country-note" placeholder="İxtiyari"></div>
+    `;
+
+    if (id) {
+        const c = dataManager.getAllCountries().find(x => x.id === id);
+        if (c) {
+            document.getElementById('f-country-platform').value = c.platformId;
+            document.getElementById('f-country-name').value = c.name;
+            document.getElementById('f-country-code').value = c.code;
+            document.getElementById('f-country-flag').value = c.flag;
+            document.getElementById('f-country-stock').value = c.stock;
+            document.getElementById('f-country-status').value = c.status;
+            document.getElementById('f-country-quality').value = c.quality;
+            document.getElementById('f-country-price').value = c.price;
+            document.getElementById('f-country-showprice').checked = c.showPrice;
+            document.getElementById('f-country-note').value = c.note || '';
+        }
+    }
+    showModal();
+}
+
+function editCountry(id) { showCountryModal(id); }
+function deleteCountry(id) { if (confirm('Silmək istəyirsiniz?')) { dataManager.deleteCountry(id); loadAdminCountries(); } }
+
+// ===== PLATFORMS =====
+function loadAdminPlatforms() {
+    const platforms = dataManager.getAllPlatforms().filter(p => p.active);
+    const container = document.getElementById('admin-platforms-list');
+    container.innerHTML = platforms.map(p => `
+        <div class="admin-item">
+            <div class="admin-item-row">
+                <div class="admin-item-info">
+                    <span class="admin-item-icon">${p.icon}</span>
+                    <div class="admin-item-details"><h4>${p.name}</h4><span>Sıra: ${p.order}</span></div>
+                </div>
+                <div class="admin-item-actions">
+                    <button class="action-btn btn-edit" onclick="editPlatform(${p.id})">Redaktə</button>
+                    <button class="action-btn btn-delete" onclick="deletePlatform(${p.id})">Sil</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showPlatformModal(id = null) {
+    currentModalType = 'platform'; editingId = id;
+    document.getElementById('modal-title').textContent = id ? 'Redaktə et' : 'Platform əlavə et';
+    document.getElementById('modal-body').innerHTML = `
+        <div class="form-group"><label>Platform adı</label><input type="text" id="f-platform-name" placeholder="WhatsApp"></div>
+        <div class="form-group"><label>İkon (emoji)</label><input type="text" id="f-platform-icon" placeholder="💬"></div>
+    `;
+    if (id) {
+        const p = dataManager.getAllPlatforms().find(x => x.id === id);
+        if (p) { document.getElementById('f-platform-name').value = p.name; document.getElementById('f-platform-icon').value = p.icon; }
+    }
+    showModal();
+}
+function editPlatform(id) { showPlatformModal(id); }
+function deletePlatform(id) { if (confirm('Silmək?')) { dataManager.deletePlatform(id); loadAdminPlatforms(); } }
+
+
+// ===== REVIEWS =====
 function loadAdminReviews() {
-    const reviews = dataManager.getAllReviews().filter(r => r.active);
+    let reviews = dataManager.getAllReviews();
+    if (currentReviewFilter !== 'all') {
+        reviews = reviews.filter(r => r.status === currentReviewFilter);
+    }
     const container = document.getElementById('admin-reviews-list');
 
     if (reviews.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Heç bir rəy yoxdur</p></div>';
+        container.innerHTML = '<div class="empty-state"><p>Rəy yoxdur</p></div>';
         return;
     }
 
-    container.innerHTML = reviews.map(review => `
+    container.innerHTML = reviews.map(r => {
+        const tagClass = `tag-${r.status}`;
+        const statusLabel = { pending: 'Gözləyir', approved: 'Təsdiqlənib', rejected: 'Rədd', spam: 'Spam' }[r.status] || r.status;
+        return `
         <div class="admin-item">
-            <div class="admin-item-info">
-                <span class="admin-item-icon">⭐</span>
-                <div class="admin-item-details">
-                    <h4>${review.name}</h4>
-                    <span>${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)} • ${review.date}</span>
+            <div class="admin-item-row">
+                <div class="admin-item-info">
+                    <div class="admin-item-details">
+                        <h4>${r.name} ${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)} <span class="status-tag ${tagClass}">${statusLabel}</span>${r.featured ? ' ⭐' : ''}</h4>
+                        <span>${r.platform}${r.country ? ' • ' + r.country : ''} • ${r.date}</span>
+                    </div>
+                </div>
+                <div class="admin-item-actions">
+                    ${r.status !== 'approved' ? `<button class="action-btn btn-approve" onclick="approveReview(${r.id})">✓</button>` : ''}
+                    ${r.status !== 'rejected' ? `<button class="action-btn btn-reject" onclick="rejectReview(${r.id})">✕</button>` : ''}
+                    <button class="action-btn btn-feature" onclick="toggleFeatured(${r.id})">${r.featured ? '☆' : '⭐'}</button>
+                    <button class="action-btn btn-delete" onclick="deleteReview(${r.id})">🗑</button>
                 </div>
             </div>
-            <div class="admin-item-actions">
-                <button class="edit-btn" onclick="editItem('review', ${review.id})">Redaktə</button>
-                <button class="delete-btn" onclick="deleteItem('review', ${review.id})">Sil</button>
-            </div>
-        </div>
-    `).join('');
+            <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:6px;line-height:1.4;">${r.text}</p>
+        </div>`;
+    }).join('');
 }
 
+function filterReviews(status, el) {
+    currentReviewFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    loadAdminReviews();
+}
+
+function approveReview(id) { dataManager.updateReview(id, { status: 'approved' }); loadAdminReviews(); }
+function rejectReview(id) { dataManager.updateReview(id, { status: 'rejected' }); loadAdminReviews(); }
+function toggleFeatured(id) {
+    const reviews = dataManager.getAllReviews();
+    const r = reviews.find(x => x.id === id);
+    if (r) { dataManager.updateReview(id, { featured: !r.featured }); loadAdminReviews(); }
+}
+function deleteReview(id) { if (confirm('Silmək?')) { dataManager.deleteReview(id); loadAdminReviews(); } }
+
+// ===== FAQS =====
 function loadAdminFaqs() {
     const faqs = dataManager.getAllFaqs().filter(f => f.active);
     const container = document.getElementById('admin-faqs-list');
+    if (faqs.length === 0) { container.innerHTML = '<div class="empty-state"><p>FAQ yoxdur</p></div>'; return; }
 
-    if (faqs.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Heç bir sual yoxdur</p></div>';
-        return;
-    }
-
-    container.innerHTML = faqs.map(faq => `
+    container.innerHTML = faqs.map(f => `
         <div class="admin-item">
-            <div class="admin-item-info">
-                <span class="admin-item-icon">❓</span>
-                <div class="admin-item-details">
-                    <h4>${faq.question}</h4>
-                    <span>${faq.answer.substring(0, 50)}...</span>
+            <div class="admin-item-row">
+                <div class="admin-item-info">
+                    <div class="admin-item-details">
+                        <h4>${f.question}</h4>
+                        <span>${f.answer.substring(0, 60)}...</span>
+                    </div>
                 </div>
-            </div>
-            <div class="admin-item-actions">
-                <button class="edit-btn" onclick="editItem('faq', ${faq.id})">Redaktə</button>
-                <button class="delete-btn" onclick="deleteItem('faq', ${faq.id})">Sil</button>
+                <div class="admin-item-actions">
+                    <button class="action-btn btn-edit" onclick="editFaq(${f.id})">Redaktə</button>
+                    <button class="action-btn btn-delete" onclick="deleteFaq(${f.id})">Sil</button>
+                </div>
             </div>
         </div>
     `).join('');
 }
 
-// ===== Modal Functions =====
-function showModal(type) {
-    currentModalType = type;
-    editingItemId = null;
-    
-    const overlay = document.getElementById('modal-overlay');
-    const title = document.getElementById('modal-title');
-    const body = document.getElementById('modal-body');
-
-    switch(type) {
-        case 'platform':
-            title.textContent = 'Platform Əlavə Et';
-            body.innerHTML = `
-                <div class="form-group">
-                    <label>Platform adı</label>
-                    <input type="text" id="form-platform-name" placeholder="Məs: WhatsApp">
-                </div>
-                <div class="form-group">
-                    <label>İkon (emoji)</label>
-                    <input type="text" id="form-platform-icon" placeholder="Məs: 💬">
-                </div>
-            `;
-            break;
-
-        case 'country':
-            const platforms = dataManager.getPlatforms();
-            title.textContent = 'Ölkə Əlavə Et';
-            body.innerHTML = `
-                <div class="form-group">
-                    <label>Platform</label>
-                    <select id="form-country-platform">
-                        ${platforms.map(p => `<option value="${p.id}">${p.icon} ${p.name}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ölkə adı</label>
-                    <input type="text" id="form-country-name" placeholder="Məs: Türkiyə">
-                </div>
-                <div class="form-group">
-                    <label>Ölkə kodu</label>
-                    <input type="text" id="form-country-code" placeholder="Məs: +90">
-                </div>
-                <div class="form-group">
-                    <label>Bayraq (emoji)</label>
-                    <input type="text" id="form-country-flag" placeholder="Məs: 🇹🇷">
-                </div>
-                <div class="form-group">
-                    <label>Qiymət (AZN)</label>
-                    <input type="number" id="form-country-price" placeholder="Məs: 5" min="1">
-                </div>
-            `;
-            break;
-
-        case 'review':
-            title.textContent = 'Rəy Əlavə Et';
-            body.innerHTML = `
-                <div class="form-group">
-                    <label>Müştəri adı</label>
-                    <input type="text" id="form-review-name" placeholder="Məs: Əli M.">
-                </div>
-                <div class="form-group">
-                    <label>Rəy mətni</label>
-                    <textarea id="form-review-text" placeholder="Müştəri rəyi..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Reytinq (1-5)</label>
-                    <select id="form-review-rating">
-                        <option value="5">★★★★★ (5)</option>
-                        <option value="4">★★★★☆ (4)</option>
-                        <option value="3">★★★☆☆ (3)</option>
-                        <option value="2">★★☆☆☆ (2)</option>
-                        <option value="1">★☆☆☆☆ (1)</option>
-                    </select>
-                </div>
-            `;
-            break;
-
-        case 'faq':
-            title.textContent = 'Sual Əlavə Et';
-            body.innerHTML = `
-                <div class="form-group">
-                    <label>Sual</label>
-                    <input type="text" id="form-faq-question" placeholder="Sualı yazın...">
-                </div>
-                <div class="form-group">
-                    <label>Cavab</label>
-                    <textarea id="form-faq-answer" placeholder="Cavabı yazın..."></textarea>
-                </div>
-            `;
-            break;
+function showFaqModal(id = null) {
+    currentModalType = 'faq'; editingId = id;
+    document.getElementById('modal-title').textContent = id ? 'Redaktə et' : 'Sual əlavə et';
+    document.getElementById('modal-body').innerHTML = `
+        <div class="form-group"><label>Sual</label><input type="text" id="f-faq-question" placeholder="Sual..."></div>
+        <div class="form-group"><label>Cavab</label><textarea id="f-faq-answer" rows="4" placeholder="Cavab..."></textarea></div>
+    `;
+    if (id) {
+        const f = dataManager.getAllFaqs().find(x => x.id === id);
+        if (f) { document.getElementById('f-faq-question').value = f.question; document.getElementById('f-faq-answer').value = f.answer; }
     }
+    showModal();
+}
+function editFaq(id) { showFaqModal(id); }
+function deleteFaq(id) { if (confirm('Silmək?')) { dataManager.deleteFaq(id); loadAdminFaqs(); } }
 
-    overlay.classList.add('active');
+
+// ===== SETTINGS =====
+function loadSettings() {
+    const s = dataManager.getSettings();
+    document.getElementById('set-whatsapp').value = s.whatsappNumber || '';
+    document.getElementById('set-instagram').value = s.instagram || '';
+    document.getElementById('set-telegram').value = s.telegram || '';
+    document.getElementById('set-email').value = s.email || '';
+    document.getElementById('set-hours').value = s.workingHours || '';
+    document.getElementById('set-message').value = s.defaultMessage || '';
 }
 
-function editItem(type, id) {
-    currentModalType = type;
-    editingItemId = id;
-    
-    showModal(type);
-    document.getElementById('modal-title').textContent = 'Redaktə Et';
-
-    // Fill form with existing data
-    switch(type) {
-        case 'platform':
-            const platform = dataManager.getAllPlatforms().find(p => p.id === id);
-            if (platform) {
-                document.getElementById('form-platform-name').value = platform.name;
-                document.getElementById('form-platform-icon').value = platform.icon;
-            }
-            break;
-
-        case 'country':
-            const country = dataManager.getAllCountries().find(c => c.id === id);
-            if (country) {
-                document.getElementById('form-country-platform').value = country.platformId;
-                document.getElementById('form-country-name').value = country.name;
-                document.getElementById('form-country-code').value = country.code;
-                document.getElementById('form-country-flag').value = country.flag;
-                document.getElementById('form-country-price').value = country.price;
-            }
-            break;
-
-        case 'review':
-            const review = dataManager.getAllReviews().find(r => r.id === id);
-            if (review) {
-                document.getElementById('form-review-name').value = review.name;
-                document.getElementById('form-review-text').value = review.text;
-                document.getElementById('form-review-rating').value = review.rating;
-            }
-            break;
-
-        case 'faq':
-            const faq = dataManager.getAllFaqs().find(f => f.id === id);
-            if (faq) {
-                document.getElementById('form-faq-question').value = faq.question;
-                document.getElementById('form-faq-answer').value = faq.answer;
-            }
-            break;
-    }
-}
-
-function saveModal() {
-    switch(currentModalType) {
-        case 'platform':
-            const platformData = {
-                name: document.getElementById('form-platform-name').value.trim(),
-                icon: document.getElementById('form-platform-icon').value.trim()
-            };
-            if (!platformData.name || !platformData.icon) {
-                alert('Bütün sahələri doldurun!');
-                return;
-            }
-            if (editingItemId) {
-                dataManager.updatePlatform(editingItemId, platformData);
-            } else {
-                dataManager.addPlatform(platformData);
-            }
-            loadAdminPlatforms();
-            break;
-
-        case 'country':
-            const countryData = {
-                platformId: parseInt(document.getElementById('form-country-platform').value),
-                name: document.getElementById('form-country-name').value.trim(),
-                code: document.getElementById('form-country-code').value.trim(),
-                flag: document.getElementById('form-country-flag').value.trim(),
-                price: parseInt(document.getElementById('form-country-price').value)
-            };
-            if (!countryData.name || !countryData.code || !countryData.flag || !countryData.price) {
-                alert('Bütün sahələri doldurun!');
-                return;
-            }
-            if (editingItemId) {
-                dataManager.updateCountry(editingItemId, countryData);
-            } else {
-                dataManager.addCountry(countryData);
-            }
-            loadAdminCountries();
-            break;
-
-        case 'review':
-            const reviewData = {
-                name: document.getElementById('form-review-name').value.trim(),
-                text: document.getElementById('form-review-text').value.trim(),
-                rating: parseInt(document.getElementById('form-review-rating').value)
-            };
-            if (!reviewData.name || !reviewData.text) {
-                alert('Bütün sahələri doldurun!');
-                return;
-            }
-            if (editingItemId) {
-                dataManager.updateReview(editingItemId, reviewData);
-            } else {
-                dataManager.addReview(reviewData);
-            }
-            loadAdminReviews();
-            break;
-
-        case 'faq':
-            const faqData = {
-                question: document.getElementById('form-faq-question').value.trim(),
-                answer: document.getElementById('form-faq-answer').value.trim()
-            };
-            if (!faqData.question || !faqData.answer) {
-                alert('Bütün sahələri doldurun!');
-                return;
-            }
-            if (editingItemId) {
-                dataManager.updateFaq(editingItemId, faqData);
-            } else {
-                dataManager.addFaq(faqData);
-            }
-            loadAdminFaqs();
-            break;
-    }
-
-    hideModal();
-}
-
-function deleteItem(type, id) {
-    if (!confirm('Silmək istədiyinizə əminsiniz?')) return;
-
-    switch(type) {
-        case 'platform':
-            dataManager.deletePlatform(id);
-            loadAdminPlatforms();
-            break;
-        case 'country':
-            dataManager.deleteCountry(id);
-            loadAdminCountries();
-            break;
-        case 'review':
-            dataManager.deleteReview(id);
-            loadAdminReviews();
-            break;
-        case 'faq':
-            dataManager.deleteFaq(id);
-            loadAdminFaqs();
-            break;
-    }
-}
-
-function hideModal() {
-    document.getElementById('modal-overlay').classList.remove('active');
-    currentModalType = null;
-    editingItemId = null;
-}
-
-function closeModal(event) {
-    if (event.target === event.currentTarget) {
-        hideModal();
-    }
+function saveSettings(event) {
+    event.preventDefault();
+    dataManager.updateSettings({
+        whatsappNumber: document.getElementById('set-whatsapp').value.trim(),
+        instagram: document.getElementById('set-instagram').value.trim(),
+        telegram: document.getElementById('set-telegram').value.trim(),
+        email: document.getElementById('set-email').value.trim(),
+        workingHours: document.getElementById('set-hours').value.trim(),
+        defaultMessage: document.getElementById('set-message').value.trim()
+    });
+    alert('Ayarlar yadda saxlanıldı!');
 }
 
 function confirmReset() {
-    if (confirm('DİQQƏT! Bütün məlumatlar silinəcək və varsayılan məlumatlara sıfırlanacaq. Davam etmək istəyirsiniz?')) {
+    if (confirm('DİQQƏT! Bütün məlumatlar silinəcək. Davam?')) {
         dataManager.resetData();
-        loadAdminPlatforms();
-        alert('Məlumatlar sıfırlandı!');
+        loadAdminCountries(); loadCountryFilter();
+        alert('Sıfırlandı!');
     }
 }
 
-// ===== Initialize Admin =====
+// ===== MODAL =====
+function showModal() { document.getElementById('modal-overlay').classList.add('active'); }
+function hideModal() { document.getElementById('modal-overlay').classList.remove('active'); currentModalType = null; editingId = null; }
+function closeModal(e) { if (e.target === e.currentTarget) hideModal(); }
+
+function saveModal() {
+    switch(currentModalType) {
+        case 'country': saveCountry(); break;
+        case 'platform': savePlatform(); break;
+        case 'faq': saveFaq(); break;
+    }
+}
+
+function saveCountry() {
+    const data = {
+        platformId: parseInt(document.getElementById('f-country-platform').value),
+        name: document.getElementById('f-country-name').value.trim(),
+        code: document.getElementById('f-country-code').value.trim(),
+        flag: document.getElementById('f-country-flag').value.trim(),
+        stock: parseInt(document.getElementById('f-country-stock').value) || 0,
+        status: document.getElementById('f-country-status').value,
+        quality: document.getElementById('f-country-quality').value,
+        price: parseInt(document.getElementById('f-country-price').value) || 0,
+        showPrice: document.getElementById('f-country-showprice').checked,
+        note: document.getElementById('f-country-note').value.trim()
+    };
+    if (!data.name || !data.code || !data.flag) { alert('Məcburi sahələri doldurun!'); return; }
+    if (editingId) dataManager.updateCountry(editingId, data);
+    else dataManager.addCountry(data);
+    hideModal(); loadAdminCountries();
+}
+
+function savePlatform() {
+    const data = {
+        name: document.getElementById('f-platform-name').value.trim(),
+        icon: document.getElementById('f-platform-icon').value.trim()
+    };
+    if (!data.name || !data.icon) { alert('Doldurun!'); return; }
+    if (editingId) dataManager.updatePlatform(editingId, data);
+    else dataManager.addPlatform(data);
+    hideModal(); loadAdminPlatforms();
+}
+
+function saveFaq() {
+    const data = {
+        question: document.getElementById('f-faq-question').value.trim(),
+        answer: document.getElementById('f-faq-answer').value.trim()
+    };
+    if (!data.question || !data.answer) { alert('Doldurun!'); return; }
+    if (editingId) dataManager.updateFaq(editingId, data);
+    else dataManager.addFaq(data);
+    hideModal(); loadAdminFaqs();
+}
+
+// ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-    loadAdminPlatforms();
+    loadCountryFilter();
+    loadAdminCountries();
 });
