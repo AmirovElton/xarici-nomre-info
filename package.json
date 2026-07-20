@@ -1,12 +1,11 @@
 {
   "name": "xarici-nomre-az",
-  "version": "1.0.0",
-  "description": "XariciNomreAz - Xarici virtual nömrə satışı üçün informasiya saytı",
+  "version": "2.0.0",
+  "description": "XariciNomreAz - Xarici virtual nomreler haqqinda melumat portali",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
   },
-  "keywords": ["virtual-number", "whatsapp", "telegram"],
   "author": "XariciNomreAz",
   "license": "MIT"
 }

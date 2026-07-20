@@ -3,44 +3,24 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 3000;
-
-const MIME_TYPES = {
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'application/javascript',
-    '.json': 'application/json',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.svg': 'image/svg+xml',
-    '.ico': 'image/x-icon'
+const MIME = {
+    '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
+    '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
+    '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.xml': 'application/xml',
+    '.txt': 'text/plain'
 };
 
-const server = http.createServer((req, res) => {
-    let filePath = req.url === '/' ? '/index.html' : req.url;
+http.createServer((req, res) => {
+    let filePath = req.url === '/' ? '/index.html' : req.url.split('?')[0];
     filePath = path.join(__dirname, filePath);
-
     const ext = path.extname(filePath);
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     fs.readFile(filePath, (err, content) => {
-        if (err) {
-            if (err.code === 'ENOENT') {
-                res.writeHead(404);
-                res.end('404 - Not Found');
-            } else {
-                res.writeHead(500);
-                res.end('Server Error');
-            }
-        } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content);
-        }
+        if (err) { res.writeHead(404); res.end('404'); }
+        else { res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' }); res.end(content); }
     });
-});
-
-server.listen(PORT, () => {
-    console.log(`\\n🚀 XariciNomreAz server işləyir!`);
-    console.log(`📱 Sayt: http://localhost:${PORT}`);
-    console.log(`⚙️  Admin Panel: http://localhost:${PORT}/admin.html`);
-    console.log(`\\nDayandırmaq üçün: Ctrl+C\\n`);
+}).listen(PORT, () => {
+    console.log(`\n  XariciNomreAz server:`);
+    console.log(`  Sayt:  http://localhost:${PORT}`);
+    console.log(`  Admin: http://localhost:${PORT}/admin.html\n`);
 });

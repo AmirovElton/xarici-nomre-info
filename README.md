@@ -1,16 +1,19 @@
 # XariciNomreAz
 
-Xarici virtual nomre satisi ucun informasiya sayti.
+Xarici virtual nomreler haqqinda melumatlandirici portal.
 
 ## Xususiyyetler
 
-- Dark theme (qara + mavi)
-- Glass effect bottom navigation
-- Platformalar > Olkeler > Qiymetler strukturu
+- Dark theme (qara + mavi glassmorphism)
+- Platformalar > Olkeler > Stok veziyyeti
+- Status rengleri (yasil/narinci/mavi/boz/qirmizi)
 - WhatsApp avtomatik mesaj inteqrasiyasi
-- Admin panel (localStorage)
+- Tehlukesizlik telimatlari (WhatsApp, Telegram)
+- Musteri rey sistemi (admin tesdiqi ile)
+- Admin panel (tam CRUD)
 - Mobil-uygun dizayn
-- Orta animasiyalar
+- SEO optimizasiya
+- Huquqi sehifeler
 
 ## Ise Salmaq
 
@@ -24,9 +27,9 @@ node server.js
 ## Texnologiyalar
 
 - HTML5 / CSS3 / Vanilla JavaScript
-- localStorage (sonra Supabase-e kecid)
-- Node.js server (development)
+- localStorage (Supabase-e kecid mumkun)
+- Vercel deploy
 
 ## Deploy
 
-Vercel ve ya istənilən statik hosting ile deploy oluna bilər.
+Vercel ile avtomatik deploy olunur (vercel.json movcuddur).
