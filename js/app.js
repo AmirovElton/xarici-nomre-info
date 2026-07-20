@@ -2,6 +2,13 @@
 
 let currentPlatform = null;
 
+// ===== SVG ICONS =====
+const PLATFORM_ICONS = {
+    whatsapp: '<svg width="28" height="28" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>',
+    telegram: '<svg width="28" height="28" viewBox="0 0 24 24" fill="#2AABEE"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>',
+    other: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-light)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
+};
+
 // ===== NAVIGATION =====
 function navigateTo(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -11,12 +18,10 @@ function navigateTo(page) {
         target.classList.add('page-enter');
         setTimeout(() => target.classList.remove('page-enter'), 250);
     }
-
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     const activeNav = document.querySelector(`.nav-item[data-page="${page}"]`);
     if (activeNav) activeNav.classList.add('active');
 
-    // Load page content
     switch(page) {
         case 'home': loadHome(); break;
         case 'numbers': loadNumbers(); break;
@@ -26,6 +31,7 @@ function navigateTo(page) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+
 // ===== HOME PAGE =====
 function loadHome() {
     updateWhatsAppLinks();
@@ -33,36 +39,46 @@ function loadHome() {
 
 // ===== NUMBERS PAGE =====
 function loadNumbers() {
-    loadPlatformTabs();
+    loadPlatformCards();
 }
 
-function loadPlatformTabs() {
+function loadPlatformCards() {
     const platforms = dataManager.getPlatforms();
-    const container = document.getElementById('platforms-tabs');
+    const container = document.getElementById('platform-cards');
     if (!container) return;
 
-    if (platforms.length === 0) {
-        container.innerHTML = '';
-        document.getElementById('countries-list').innerHTML = '<div class="empty-state"><p>Hələ platform əlavə olunmayıb</p></div>';
-        return;
-    }
+    const descriptions = {
+        1: 'WhatsApp ucun xarici nomreler',
+        2: 'Telegram ucun xarici nomreler',
+        3: 'Instagram, TikTok ve s.'
+    };
 
-    container.innerHTML = platforms.map((p, i) => `
-        <button class="platform-tab ${i === 0 ? 'active' : ''}" 
-                data-platform-id="${p.id}"
-                onclick="selectPlatform(${p.id}, this)">
-            ${p.icon} ${p.name}
-        </button>
-    `).join('');
-
-    if (!currentPlatform) currentPlatform = platforms[0].id;
-    loadCountries(currentPlatform);
+    container.innerHTML = platforms.map(p => {
+        const iconClass = p.id === 1 ? 'whatsapp' : p.id === 2 ? 'telegram' : 'other';
+        const iconKey = p.id === 1 ? 'whatsapp' : p.id === 2 ? 'telegram' : 'other';
+        const isActive = currentPlatform === p.id ? 'active' : '';
+        return `
+        <div class="platform-card ${isActive}" onclick="selectPlatform(${p.id})">
+            <div class="platform-card-icon ${iconClass}">
+                ${PLATFORM_ICONS[iconKey]}
+            </div>
+            <div class="platform-card-info">
+                <h3>${p.name}</h3>
+                <p>${descriptions[p.id] || ''}</p>
+            </div>
+        </div>`;
+    }).join('');
 }
 
-function selectPlatform(platformId, el) {
+function selectPlatform(platformId) {
     currentPlatform = platformId;
-    document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
-    if (el) el.classList.add('active');
+    // Update active state
+    document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    // Show search
+    const searchContainer = document.getElementById('search-container');
+    if (searchContainer) searchContainer.classList.remove('hidden');
+    // Load countries
     loadCountries(platformId);
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = '';
@@ -76,66 +92,65 @@ function loadCountries(platformId) {
     const platformName = platform ? platform.name : '';
 
     if (countries.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Bu platform üçün ölkə əlavə olunmayıb</p></div>';
+        container.innerHTML = '<div class="empty-state"><p>Bu platform ucun olke elave olunmayib</p></div>';
         return;
     }
 
     container.innerHTML = countries.map(country => {
         const statusInfo = getStatusInfo(country.status);
-        const priceHtml = country.showPrice 
-            ? `<span class="country-price">${country.price} AZN</span>`
-            : `<span class="country-price hidden-price">Qiymət və mövcudluq üçün WhatsApp-dan məlumat alın.</span>`;
-        
-        const actionBtn = getActionButton(country, platformName);
-        
+        const priceText = country.showPrice ? `${country.price} AZN` : '---';
+        const orderUrl = dataManager.getCountryWhatsAppUrl(platformName, country.name);
+
         return `
-        <div class="country-card scale-in" data-country-name="${country.name.toLowerCase()}">
+        <div class="country-card scale-in" data-country-name="${country.name.toLowerCase()}" onclick="toggleCountryDetails(this)">
             <div class="country-card-header">
-                <div class="country-info">
+                <div class="country-card-left">
                     <span class="country-flag">${country.flag}</span>
-                    <div class="country-details">
+                    <div class="country-name-code">
                         <h4>${country.name}</h4>
-                        <span>${country.code} • ${platformName}</span>
+                        <span>${country.code}</span>
+                    </div>
+                </div>
+                <div class="country-card-right">
+                    <span class="country-price">${priceText}</span>
+                    <div class="country-info-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                 </div>
             </div>
-            <div class="country-card-meta">
-                <span class="status-badge status-${statusInfo.color}">
-                    <span class="dot dot-pulse"></span>
-                    ${statusInfo.label}
-                </span>
-                ${country.stock > 0 ? `<span class="status-badge status-green">Stok: ${country.stock}</span>` : ''}
-                <span class="quality-badge">${country.quality}</span>
-            </div>
-            ${country.note ? `<p class="country-note">${country.note}</p>` : ''}
-            <div class="country-card-footer">
-                ${priceHtml}
-                ${actionBtn}
+            <div class="country-details-panel">
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="status-badge status-${statusInfo.color}"><span class="dot dot-pulse"></span>${statusInfo.label}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Keyfiyyet</span>
+                    <span class="detail-value">${country.quality}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Stok</span>
+                    <span class="detail-value">${country.stock > 0 ? country.stock + ' eded' : 'Yoxdur'}</span>
+                </div>
+                ${country.note ? `<div class="detail-row"><span class="detail-label">Qeyd</span><span class="detail-value">${country.note}</span></div>` : ''}
+                ${(country.status === 'available' || country.status === 'low') ? `<a href="${orderUrl}" target="_blank" class="country-order-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>WhatsApp ile sifarish et</a>` : ''}
             </div>
         </div>`;
     }).join('');
 }
 
+function toggleCountryDetails(card) {
+    card.classList.toggle('expanded');
+}
+
 function getStatusInfo(status) {
     switch(status) {
         case 'available': return { label: 'Stokda var', color: 'green' };
-        case 'low': return { label: 'Az qalıb', color: 'orange' };
-        case 'soon': return { label: 'Yaxın zamanda', color: 'blue' };
-        case 'unavailable': return { label: 'Müvəqqəti mövcud deyil', color: 'gray' };
-        case 'stopped': return { label: 'Satış dayandırılıb', color: 'red' };
-        default: return { label: 'Naməlum', color: 'gray' };
+        case 'low': return { label: 'Az qalib', color: 'orange' };
+        case 'soon': return { label: 'Yaxin zamanda', color: 'blue' };
+        case 'unavailable': return { label: 'Muveqqeti yoxdur', color: 'gray' };
+        case 'stopped': return { label: 'Dayandirilb', color: 'red' };
+        default: return { label: 'Namelum', color: 'gray' };
     }
-}
-
-function getActionButton(country, platformName) {
-    if (country.status === 'available' || country.status === 'low') {
-        const url = dataManager.getCountryWhatsAppUrl(platformName, country.name);
-        return `<a href="${url}" target="_blank" class="get-info-btn">Məlumat al</a>`;
-    } else if (country.status === 'soon' || country.status === 'unavailable') {
-        const url = dataManager.getStockNotifyUrl(platformName, country.name);
-        return `<a href="${url}" target="_blank" class="stock-notify-btn">Stoka gələndə xəbər al</a>`;
-    }
-    return '';
 }
 
 function filterCountries() {
@@ -157,23 +172,26 @@ function loadInfo() {
     loadFaqSection();
 }
 
-function switchInfoTab(tabId, el) {
-    document.querySelectorAll('.info-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.info-tab').forEach(t => t.classList.remove('active'));
-    const section = document.getElementById(`info-${tabId}`);
-    if (section) section.classList.add('active');
-    if (el) el.classList.add('active');
+function openInfoSection(sectionId) {
+    // Hide grid, show content
+    const grid = document.getElementById('info-grid');
+    const content = document.getElementById('info-section-content');
+    if (grid) grid.classList.add('hidden');
+    if (content) content.classList.remove('hidden');
+
+    // Hide all sections, show selected
+    document.querySelectorAll('#info-section-content .info-section').forEach(s => s.classList.add('hidden'));
+    const section = document.getElementById(`info-${sectionId}`);
+    if (section) section.classList.remove('hidden');
 }
 
-function switchGuideTab(tabId, el) {
-    document.querySelectorAll('.guide-content').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
-    const section = document.getElementById(tabId);
-    if (section) section.classList.add('active');
-    if (el) el.classList.add('active');
+function backToInfoGrid() {
+    const grid = document.getElementById('info-grid');
+    const content = document.getElementById('info-section-content');
+    if (grid) grid.classList.remove('hidden');
+    if (content) content.classList.add('hidden');
 }
 
-// About accordion
 function loadAboutSection() {
     const items = dataManager.getAboutItems();
     const container = document.getElementById('about-accordion');
@@ -181,7 +199,6 @@ function loadAboutSection() {
     container.innerHTML = items.map(item => createAccordionItem(item.title, item.content)).join('');
 }
 
-// Process steps
 function loadProcessSteps() {
     const steps = dataManager.getProcessSteps();
     const container = document.getElementById('process-steps');
@@ -197,7 +214,6 @@ function loadProcessSteps() {
     `).join('');
 }
 
-// Safety rules
 function loadSafetyRules() {
     const rules = dataManager.getSafetyRules();
     const dontsContainer = document.getElementById('safety-donts');
@@ -205,28 +221,22 @@ function loadSafetyRules() {
     if (!dontsContainer || !dosContainer) return;
 
     dontsContainer.innerHTML = `
-        <h4>❌ İlk 24 saat EDİLMƏMƏLİ olanlar:</h4>
+        <h4>Ilk 24 saat EDILMEMELI olanlar:</h4>
         <ul>${(rules.donts || []).map(d => `<li>${d}</li>`).join('')}</ul>
     `;
     dosContainer.innerHTML = `
-        <h4>✅ İlk 24 saat TÖVSİYƏ olunanlar:</h4>
+        <h4>Ilk 24 saat TOVSIYE olunanlar:</h4>
         <ul>${(rules.dos || []).map(d => `<li>${d}</li>`).join('')}</ul>
     `;
 }
 
-// WhatsApp guide
 function loadWhatsAppGuide() {
     const guide = dataManager.getWhatsAppGuide();
     const container = document.getElementById('wa-guide-accordion');
-    const containerAndroid = document.getElementById('wa-guide-android-accordion');
     if (!container) return;
-    // Same content for both (can be differentiated later)
-    const html = guide.map(item => createAccordionItem(item.title, item.content)).join('');
-    container.innerHTML = html;
-    if (containerAndroid) containerAndroid.innerHTML = html;
+    container.innerHTML = guide.map(item => createAccordionItem(item.title, item.content)).join('');
 }
 
-// Telegram guide
 function loadTelegramGuide() {
     const guide = dataManager.getTelegramGuide();
     const container = document.getElementById('tg-guide-accordion');
@@ -234,13 +244,12 @@ function loadTelegramGuide() {
     container.innerHTML = guide.map(item => createAccordionItem(item.title, item.content)).join('');
 }
 
-// FAQ
 function loadFaqSection() {
     const faqs = dataManager.getFaqs();
     const container = document.getElementById('faq-list');
     if (!container) return;
     if (faqs.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>Hələ sual əlavə olunmayıb</p></div>';
+        container.innerHTML = '<div class="empty-state"><p>Hele sual elave olunmayib</p></div>';
         return;
     }
     container.innerHTML = faqs.map(faq => createAccordionItem(faq.question, faq.answer)).join('');
@@ -249,7 +258,6 @@ function loadFaqSection() {
 
 // ===== ACCORDION HELPER =====
 function createAccordionItem(title, content) {
-    // Convert newlines and bullet points to HTML
     const htmlContent = formatContent(content);
     return `
         <div class="accordion-item">
@@ -266,14 +274,13 @@ function createAccordionItem(title, content) {
 
 function formatContent(text) {
     if (!text) return '';
-    // Split by newlines
     const lines = text.split('\n').filter(l => l.trim());
     let html = '';
     let inList = false;
 
     lines.forEach(line => {
         const trimmed = line.trim();
-        if (trimmed.startsWith('•') || trimmed.startsWith('*')) {
+        if (trimmed.startsWith('*') && !trimmed.startsWith('**')) {
             if (!inList) { html += '<ul>'; inList = true; }
             html += `<li>${trimmed.substring(1).trim()}</li>`;
         } else if (/^\d+\./.test(trimmed)) {
@@ -281,11 +288,7 @@ function formatContent(text) {
             html += `<li>${trimmed.replace(/^\d+\.\s*/, '')}</li>`;
         } else {
             if (inList) { html += '</ul>'; inList = false; }
-            if (trimmed.startsWith('⚠️')) {
-                html += `<p style="color: var(--status-orange); font-weight: 500; margin-top: 8px;">${trimmed}</p>`;
-            } else {
-                html += `<p>${trimmed}</p>`;
-            }
+            html += `<p>${trimmed}</p>`;
         }
     });
     if (inList) html += '</ul>';
@@ -297,20 +300,23 @@ function toggleAccordion(header) {
     item.classList.toggle('active');
 }
 
+// ===== REVIEW FORM TOGGLE =====
+function toggleReviewForm() {
+    const toggle = document.getElementById('add-review-toggle');
+    const wrapper = document.getElementById('review-form-wrapper');
+    if (toggle && wrapper) {
+        toggle.classList.toggle('open');
+        wrapper.classList.toggle('open');
+    }
+}
+
 // ===== WHATSAPP LINKS =====
 function updateWhatsAppLinks() {
-    const settings = dataManager.getSettings();
     const defaultUrl = dataManager.getWhatsAppUrl();
-
-    // Hero WhatsApp button
     const heroBtn = document.getElementById('hero-whatsapp-btn');
     if (heroBtn) heroBtn.href = defaultUrl;
-
-    // Nav WhatsApp button
     const navBtn = document.getElementById('nav-whatsapp-btn');
     if (navBtn) navBtn.href = defaultUrl;
-
-    // Floating WhatsApp
     const floatBtn = document.getElementById('whatsapp-float');
     if (floatBtn) floatBtn.href = defaultUrl;
 }
@@ -320,22 +326,15 @@ function loadFooter() {
     const settings = dataManager.getSettings();
     const container = document.getElementById('footer-contacts');
     if (!container) return;
-
     let html = '';
     if (settings.whatsappNumber) {
-        html += `<a href="https://wa.me/${settings.whatsappNumber}" target="_blank" class="footer-contact-item">💬 WhatsApp</a>`;
+        html += `<a href="https://wa.me/${settings.whatsappNumber}" target="_blank" class="footer-contact-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> WhatsApp</a>`;
     }
     if (settings.instagram) {
-        html += `<a href="https://instagram.com/${settings.instagram}" target="_blank" class="footer-contact-item">📷 @${settings.instagram}</a>`;
-    }
-    if (settings.telegram) {
-        html += `<a href="https://t.me/${settings.telegram}" target="_blank" class="footer-contact-item">✈️ Telegram</a>`;
-    }
-    if (settings.email) {
-        html += `<a href="mailto:${settings.email}" class="footer-contact-item">📧 ${settings.email}</a>`;
+        html += `<a href="https://instagram.com/${settings.instagram}" target="_blank" class="footer-contact-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg> @${settings.instagram}</a>`;
     }
     if (settings.workingHours) {
-        html += `<span class="footer-contact-item">🕐 ${settings.workingHours}</span>`;
+        html += `<span class="footer-contact-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${settings.workingHours}</span>`;
     }
     container.innerHTML = html;
 }
