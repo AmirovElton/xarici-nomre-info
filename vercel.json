@@ -5,6 +5,7 @@
   ],
   "routes": [
     { "src": "/api/webhook", "dest": "/api/webhook.js" },
+    { "src": "/api/debug", "dest": "/api/debug.js" },
     { "src": "/api/admin/(.*)", "dest": "/api/admin/$1" }
   ]
 }
