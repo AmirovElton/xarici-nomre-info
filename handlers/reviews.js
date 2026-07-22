@@ -1,5 +1,5 @@
 import { sendOrEdit, inlineKeyboard, sendMessage, deleteMessage } from '../lib/telegram.js';
-import { supabase, supabaseAdmin } from '../lib/supabase.js';
+import { supabaseAdmin } from '../lib/supabase.js';
 import { updateUserState, updateUserMessageId } from '../lib/userState.js';
 
 const REVIEWS_PER_PAGE = 5;
@@ -157,7 +157,7 @@ Aşağıdan ulduz sayını seçin:`;
   ]);
 
   // Köhnə mesajı yenilə
-  const { data: userData } = await supabase
+  const { data: userData } = await supabaseAdmin
     .from('users')
     .select('last_message_id')
     .eq('telegram_id', chatId)

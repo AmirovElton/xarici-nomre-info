@@ -1,5 +1,5 @@
 import { sendOrEdit, inlineKeyboard } from '../lib/telegram.js';
-import { supabase } from '../lib/supabase.js';
+import { supabaseAdmin } from '../lib/supabase.js';
 
 const COUNTRIES_PER_PAGE = 5;
 const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '994501234567';
@@ -9,7 +9,7 @@ const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '994501234567';
  */
 export async function handleNumbers(chatId, messageId) {
   // Platformaları bazadan al
-  const { data: platforms } = await supabase
+  const { data: platforms } = await supabaseAdmin
     .from('platforms')
     .select('*')
     .eq('is_active', true)
@@ -46,7 +46,7 @@ export async function handlePlatform(chatId, messageId, platformId) {
  */
 export async function handleCountryPage(chatId, messageId, platformId, page) {
   // Platformanı al
-  const { data: platform } = await supabase
+  const { data: platform } = await supabaseAdmin
     .from('platforms')
     .select('*')
     .eq('id', platformId)
@@ -55,7 +55,7 @@ export async function handleCountryPage(chatId, messageId, platformId, page) {
   if (!platform) return;
 
   // Ölkələri al
-  const { data: countries, count } = await supabase
+  const { data: countries, count } = await supabaseAdmin
     .from('countries')
     .select('*', { count: 'exact' })
     .eq('platform_id', platformId)
@@ -133,7 +133,7 @@ export async function handleCountryPage(chatId, messageId, platformId, page) {
  */
 export async function handleCountry(chatId, messageId, countryId) {
   // Ölkəni al (platform məlumatı ilə)
-  const { data: country } = await supabase
+  const { data: country } = await supabaseAdmin
     .from('countries')
     .select('*, platforms(id, name, emoji)')
     .eq('id', countryId)
