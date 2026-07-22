@@ -3,7 +3,7 @@ import { getOrCreateUser, updateUserMessageId, getUserMessageId, updateUserState
 import { handleStart } from '../handlers/start.js';
 import { handleInfo, handleInfoSubmenu } from '../handlers/info.js';
 import { handleNumbers, handlePlatform, handleCountry, handleCountryPage } from '../handlers/numbers.js';
-import { handleReviews, handleReviewPage, handleReviewAdd, handleReviewRating, handleReviewText } from '../handlers/reviews.js';
+import { handleReviews, handleReviewAdd, handleReviewRating, handleReviewText } from '../handlers/reviews.js';
 import { handleAdmin, handleAdminCallback, handleAdminMessage } from '../handlers/admin.js';
 
 export default async function handler(req, res) {
