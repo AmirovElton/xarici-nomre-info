@@ -12,7 +12,28 @@ export default async function handler(req, res) {
   }
 
   try {
-    const update = req.body;
+    // req.body bəzən string kimi gələ bilər - təhlükəsiz parse
+    let update = req.body;
+    if (typeof update === 'string') {
+      try {
+        update = JSON.parse(update);
+      } catch (e) {
+        console.error('Body parse error:', e.message);
+        return res.status(200).send('OK');
+      }
+    }
+
+    if (!update) {
+      return res.status(200).send('OK');
+    }
+
+    // Debug log (Vercel logs-da görünəcək)
+    console.log('Incoming update:', JSON.stringify({
+      type: update.callback_query ? 'callback' : update.message ? 'message' : 'other',
+      data: update.callback_query?.data,
+      text: update.message?.text,
+      from: update.message?.from?.id || update.callback_query?.from?.id,
+    }));
 
     // Callback query (düymə basıldı)
     if (update.callback_query) {
@@ -28,7 +49,7 @@ export default async function handler(req, res) {
 
     res.status(200).send('OK');
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('Webhook error:', error.message, error.stack);
     res.status(200).send('OK'); // Telegram-a həmişə 200 qaytarırıq
   }
 }
@@ -68,6 +89,7 @@ async function handleMessage(message) {
 
   // İstifadəçi state yoxla
   const state = await getUserState(chatId);
+  console.log(`handleMessage: chatId=${chatId}, state=${state}, text="${text}"`);
 
   // Admin state-ləri (platforma/ölkə/stok əlavə etmə)
   const adminId = process.env.ADMIN_CHAT_ID;
