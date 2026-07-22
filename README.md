@@ -169,3 +169,38 @@ curl -X DELETE -H "Authorization: Bearer YOUR_PASSWORD" \
 - Bot 7/24 işləyir (serverless)
 - GitHub-a push etdikdə avtomatik deploy olunur
 - Stok və qiymət dəyişiklikləri dərhal bot-da əks olunur
+
+
+
+## 🔧 Problemlərin Həlli (Troubleshooting)
+
+### ❌ Bot mətn mesajlarına cavab vermir (rəy, admin input)
+
+Bu ən çox rast gəlinən problemdir. Səbəbi: `users` cədvəlində `state` sütunu yoxdur.
+
+**Həll:**
+1. Supabase → SQL Editor aç
+2. `database/migration.sql` faylının içindəkiləri çalışdır
+3. Bu, çatışmayan sütunları (`state`, `last_message_id`, `updated_at`) təhlükəsiz əlavə edir (məlumatı silmir)
+
+### ❌ Bot ümumiyyətlə cavab vermir
+
+1. **Environment Variables yoxla** — Vercel-də bu 3-ü mütləq olmalıdır:
+   - `BOT_TOKEN`
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_KEY` ← **ən vacib!** Bu olmadan state işləməz
+2. **Webhook yoxla:**
+   ```
+   https://api.telegram.org/bot<TOKEN>/getWebhookInfo
+   ```
+   `url` düzgün olmalıdır və `last_error_message` boş olmalıdır
+
+### 🔍 Diaqnostika (Vercel Logs)
+
+Bot artıq hər addımı loglayır. Vercel → Layihə → **Logs** bölməsində:
+- `Incoming update:` — gələn mesajlar
+- `handleMessage: state=...` — istifadəçi state-i
+- `updateUserState error:` — əgər state yazıla bilmirsə (sütun problemi)
+- `SUPABASE_SERVICE_KEY təyin edilməyib` — env dəyişən problemi
+
+Bu loglar problemin dəqiq harada olduğunu göstərəcək.

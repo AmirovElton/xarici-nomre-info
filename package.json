@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "XariciNömrəAz - Virtual nömrə satışı üçün Telegram bot",
   "main": "api/webhook.js",
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"
