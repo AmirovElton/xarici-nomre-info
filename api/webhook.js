@@ -4,7 +4,7 @@ import { handleStart } from '../handlers/start.js';
 import { handleInfo, handleInfoSubmenu } from '../handlers/info.js';
 import { handleNumbers, handlePlatform, handleCountry, handleCountryPage } from '../handlers/numbers.js';
 import { handleReviews, handleReviewPage, handleReviewAdd, handleReviewRating, handleReviewText } from '../handlers/reviews.js';
-import { handleAdmin, handleAdminCallback } from '../handlers/admin.js';
+import { handleAdmin, handleAdminCallback, handleAdminMessage } from '../handlers/admin.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -66,10 +66,19 @@ async function handleMessage(message) {
     return;
   }
 
-  // İstifadəçi state yoxla (rəy yazma prosesindədirsə)
+  // İstifadəçi state yoxla
   const state = await getUserState(chatId);
+
+  // Admin state-ləri (platforma/ölkə/stok əlavə etmə)
+  const adminId = process.env.ADMIN_CHAT_ID;
+  if (String(chatId) === String(adminId) && state && state.startsWith('adm_')) {
+    await deleteMessage(chatId, message.message_id);
+    const handled = await handleAdminMessage(chatId, user, text);
+    if (handled) return;
+  }
+
+  // Rəy yazma prosesindədirsə
   if (state === 'awaiting_review') {
-    // İstifadəçinin mesajını sil (təmiz saxla)
     await deleteMessage(chatId, message.message_id);
     await handleReviewText(chatId, user, text);
     return;
@@ -152,7 +161,7 @@ async function handleCallbackQuery(query) {
   }
 
   // Admin bölməsi
-  if (data.startsWith('admin_')) {
+  if (data.startsWith('adm_')) {
     const adminId = process.env.ADMIN_CHAT_ID;
     if (String(chatId) === String(adminId)) {
       await handleAdminCallback(chatId, messageId, data);
